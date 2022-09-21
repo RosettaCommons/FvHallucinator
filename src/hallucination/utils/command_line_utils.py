@@ -145,20 +145,25 @@ def _get_args():
                         action='store_true',
                         default=False,
                         help='overwrite existing dirs')
-    parser.add_argument('--autostop',
+    parser.add_argument('--disable_autostop',
                         default=False,
                         action='store_true',
                         help=
-                        'Automatically stop trajectory if all losses are equilibrated. Default False.'
-    )
+                        'Default:Automatically stop trajectory if all losses are equilibrated. \
+                        Use this option for disabling autostop. May be useful if \
+                        hallucinating large regions (full Fv). \
+                        Application has not been optimized for this mode.')
     parser.add_argument('--seed_with_WT',
                         default=False,
                         action='store_true',
                         help='Seed with WT (Wildtype seeding in published work) at initialization.')
-    parser.add_argument('--apply_lr_scheduler',
+    parser.add_argument('--disable_lr_scheduler',
                         action='store_true',
                         default=False,
-                        help='apply learning rate scheduler')
+                        help='Learning rate scheduler is applied by default. \
+                              See default settings --lr settings. Disable with this option.\
+                              May be useful for determining the right lr settings for your system.\
+                              Default settings usually work for cases described in the work.')
     parser.add_argument('--lr_settings',
                         type=str,
                         default='0.05,30,10',
@@ -167,7 +172,8 @@ def _get_args():
                         type=str,
                         default='',
                         help='read numpy array from a pssm. \
-                            Specify sequence restrictions for all positions as a numpy array.')
+                            Specify sequence restrictions for all\
+                            positions as a numpy array.')
     parser.add_argument('--use_global_loss',
                         action='store_true',
                         default=False,

@@ -77,9 +77,9 @@ def run_hallucination(model_path,
                       restricted_dict_keep_aas={},
                       disallowed_aas='',
                       use_manual_seed=True,
-                      autostop=False,
+                      autostop=True,
                       seed_with_WT=False,
-                      apply_lr_scheduler=False,
+                      apply_lr_scheduler=True,
                       lr_dict={'learning_rate':0.05, 'patience':20, 'cooldown':10},
                       pssm=None,
                       local_loss_only=True
@@ -303,7 +303,6 @@ def _cli():
     if args.exclude != '':
         dict_exclude = comma_separated_chain_indices_to_dict(args.exclude)
 
-    #Will implement both togther - not high priority right now
     if args.restrict_positions_to_freq != '' and args.restrict_positions_to_aas != '' and \
         args.restrict_positions_to_aas_except != '':
         raise argparse.ArgumentError.message('--restrict_positions_to_freq or \
@@ -316,7 +315,6 @@ def _cli():
     if args.restrict_positions_to_freq != '':
         restricted_dict = _indstr_to_dictlist_freqs(
             args.restrict_positions_to_freq)
-        #print('Restricting specified positions to ', restricted_dict)
 
     pssm_mat = None
     if args.apply_distribution_from_pssm != '':
@@ -379,9 +377,9 @@ def _cli():
                         restricted_dict_keep_aas=restricted_dict_keep_aas,
                         disallowed_aas=disallowed_aas,
                         use_manual_seed=(not args.random_seed),
-                        autostop=args.autostop,
+                        autostop=(not args.disable_autostop),
                         seed_with_WT=args.seed_with_WT,
-                        apply_lr_scheduler=args.apply_lr_scheduler,
+                        apply_lr_scheduler=(not args.disable_lr_scheduler),
                         lr_dict=lr_config,
                         pssm=pssm_mat,
                         local_loss_only=(not args.use_global_loss))
