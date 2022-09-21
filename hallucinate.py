@@ -384,7 +384,7 @@ def _cli():
                         apply_lr_scheduler=args.apply_lr_scheduler,
                         lr_dict=lr_config,
                         pssm=pssm_mat,
-                        local_loss_only=(not args.use_glocal_loss))
+                        local_loss_only=(not args.use_global_loss))
 
 
 if __name__ == '__main__':

@@ -1,15 +1,14 @@
 import os
 import sys
-import glob
 import matplotlib
-from hallucination.utils.trajectoryreader import HallucinationDataReader
+from src.hallucination.utils.trajectoryreader import HallucinationDataReader
 matplotlib.use('Agg')
 import numpy as np
 import argparse
 import glob
 import json
 
-from util.pdb import get_pdb_chain_seq,\
+from src.util.pdb import get_pdb_chain_seq,\
     get_pdb_numbering_from_residue_indices, get_cluster_for_cdrs
 from src.hallucination.utils.sequence_utils import *
 from src.hallucination.utils.util import get_indices_from_different_methods, \
@@ -233,7 +232,9 @@ def _get_args():
     parser.add_argument('--cdr_cluster_database',
                         type=str,
                         default='',
-                        help='Current database downloaded from PyIgClassify website September 2021 or pickled file.' )
+                        help='Current database downloaded from PyIgClassify website\
+                            September 2021 or pickled file. DB used in publication\
+                            provided data/cdr_clusters_pssm_dict.pkl' )
     
     return parser.parse_args()
 
