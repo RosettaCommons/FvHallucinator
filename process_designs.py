@@ -11,12 +11,12 @@ import json
 
 from util.pdb import get_pdb_chain_seq,\
     get_pdb_numbering_from_residue_indices, get_cluster_for_cdrs
-from hallucination.utils.sequence_utils import *
-from hallucination.utils.util import get_indices_from_different_methods, \
+from src.hallucination.utils.sequence_utils import *
+from src.hallucination.utils.util import get_indices_from_different_methods, \
                                       comma_separated_chain_indices_to_dict
-from hallucination.utils.compare_to_PyIgClassify_clusters import \
+from src.hallucination.utils.compare_to_PyIgClassify_clusters import \
     bhattacharyya_distance, read_PyIgClassify_database
-from hallucination.utils.h_germline_enrichment_utils import \
+from src.hallucination.utils.h_germline_enrichment_utils import \
     calculate_fr_scores_for_designs, get_imgt_and_germline
 
 def calculate_bhattacharya_distance(cdr_sequences,
@@ -78,7 +78,6 @@ def process_hallucination_output(target_pdb,
     if not os.path.exists(out_path):
         os.mkdir(out_path)
     
-    # TODO: NEW CODE; to be tested
     data_reader = HallucinationDataReader(indices_hal, target_pdb, trajfiles_path)
     outfile = os.path.join(out_path, 'sequences.fasta')
     data_reader.write_final_sequences_to_fasta(outfile)
