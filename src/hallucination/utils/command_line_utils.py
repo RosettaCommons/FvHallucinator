@@ -100,8 +100,10 @@ def _get_args():
         help='Constrain max number of AA of same type to max of 4.')
     parser.add_argument('--geometric_loss_list',
                         type=str,
-                        default='',
-                        help='Specific loss weights for distance, orientation etc.')
+                        default='1,1,1,1,1',
+                        help='Specific loss weights for distance, orientation etc.\
+                            First 3 for distances; remaining for dihedral and planar geometries.\
+                            See DeepAb methods sections for more details.')
     parser.add_argument('--restrict_positions_to_freq',
                         type=str,
                         default='',
@@ -152,7 +154,7 @@ def _get_args():
     parser.add_argument('--seed_with_WT',
                         default=False,
                         action='store_true',
-                        help='Seed with WT instead of a random sequence.')
+                        help='Seed with WT (Wildtype seeding in published work) at initialization.')
     parser.add_argument('--apply_lr_scheduler',
                         action='store_true',
                         default=False,
@@ -166,10 +168,13 @@ def _get_args():
                         default='',
                         help='read numpy array from a pssm. \
                             Specify sequence restrictions for all positions as a numpy array.')
-    parser.add_argument('--use_local_loss_only',
+    parser.add_argument('--use_global_loss',
                         action='store_true',
                         default=False,
-                        help='Calculate geometric loss within a distance cutoff of 10 angstrom. Recommended setting.')
+                        help='Geometric losses are calculated\
+                             within a distance cutoff of 10 angstrom by default. This option\
+                             disables that. Expect more fluctuation in losses. Check loss convergence.\
+                             Adjust number of --iterations, --lr_settings to get better convergence.')
     parser.add_argument('--disable_nondesign_mask',
                         action='store_true',
                         default=False,
