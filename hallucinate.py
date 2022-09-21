@@ -11,32 +11,32 @@ from tqdm import tqdm
 import warnings
 import json
 
-from util.util import _aa_dict
-from deepab.models.ModelEnsemble import ModelEnsemble
-from util.get_bins import get_dist_bins, get_dihedral_bins, get_planar_bins
-from util.masking import mask_from_indices_list
-from util.pdb import get_pdb_chain_seq, \
+from src.util.util import _aa_dict
+from src.deepab.models.ModelEnsemble import ModelEnsemble
+from src.util.get_bins import get_dist_bins, get_dihedral_bins, get_planar_bins
+from src.util.masking import mask_from_indices_list
+from src.util.pdb import get_pdb_chain_seq, \
                             protein_pairwise_geometry_matrix
-from util.preprocess import bin_value_matrix
-from hallucination.SequenceHallucinator import SequenceHallucinator
-from hallucination.loss.setup_losses import setup_loss_components,\
+from src.util.preprocess import bin_value_matrix
+from src.hallucination.SequenceHallucinator import SequenceHallucinator
+from src.hallucination.loss.setup_losses import setup_loss_components,\
                                                    setup_loss_weights,\
                                                    get_reference_losses,\
                                                    debug_wt_losses
-from hallucination.utils.util import  get_model_file,\
+from src.hallucination.utils.util import  get_model_file,\
                                       comma_separated_chain_indices_to_dict,\
                                       get_indices_from_different_methods,\
                                       convert_chain_aa_to_index_aa_map
 
 
-from hallucination.utils.command_line_utils import _get_args
-from hallucination.utils.loss_plotting_utils import plot_all_losses
+from src.hallucination.utils.command_line_utils import _get_args
+from src.hallucination.utils.loss_plotting_utils import plot_all_losses
 
 
 def load_model_from_dict(model_files,
                          device=None):
 
-    from deepab.models.AbResNet.AbResNet \
+    from src.deepab.models.AbResNet.AbResNet \
         import load_model
     return ModelEnsemble(load_model,
                          model_files,
