@@ -29,9 +29,7 @@ class HallucinationLossParams():
 
 latest_models = ['latest']
 model_dict = {'latest': 'AbResNet'}
-geometric_loss_dict = {
-    'latest': [1, 1, 1, 1, 1, 1]
-}
+geometric_loss_dict = [1, 1, 1, 1, 1, 1]
 oas_heavy_seq_dist = torch.tensor(
     np.loadtxt("data/ab_seq_distributions/all_heavy_dist.csv")).float()
 

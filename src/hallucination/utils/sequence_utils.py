@@ -1,5 +1,5 @@
 
-from util.util import letter_to_num, _aa_dict
+from src.util.util import letter_to_num, _aa_dict
 from torch.nn import functional as F
 from scipy.stats import entropy as scipy_entropy
 import matplotlib.pyplot as plt

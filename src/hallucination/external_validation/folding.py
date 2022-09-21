@@ -1,4 +1,4 @@
-from src.generate_pdbs_from_sequences \
+from generate_pdbs_from_sequences \
      import get_rmsd_metrics_for_pdb, get_hal_indices, \
          plot_cdr_metric_distributions, plot_logos_for_design_ids, renumber_from_target, \
              plot_thresholded_metrics

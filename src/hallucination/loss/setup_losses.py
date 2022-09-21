@@ -96,8 +96,8 @@ def setup_loss_weights(args):
 
     if args.geometric_loss_list == '':
         print('Using geometric loss weights: ',
-              params.geometric_loss_dict[args.model_type])
-        geometric_loss_list = params.geometric_loss_dict[args.model_type]
+              params.geometric_loss_dict)
+        geometric_loss_list = params.geometric_loss_dict
     else:
         geometric_loss_list = [
             float(t) for t in (args.geometric_loss_list).split(',')

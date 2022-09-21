@@ -1,7 +1,7 @@
 import pandas as pd
 import os, sys
 import pickle, argparse
-import scipy, itertools
+import itertools
 import numpy as np
 from numpy import inf 
 import seaborn as sns
