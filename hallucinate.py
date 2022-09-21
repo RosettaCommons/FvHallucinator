@@ -81,7 +81,8 @@ def run_hallucination(model_path,
                       seed_with_WT=False,
                       apply_lr_scheduler=False,
                       lr_dict={'learning_rate':0.05, 'patience':20, 'cooldown':10},
-                      pssm=None
+                      pssm=None,
+                      local_loss_only=True
                       ):
 
     device_type = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -165,6 +166,7 @@ def run_hallucination(model_path,
                               pssm=pssm,
                               wt_losses_mask=list_wt_mask,
                               outdir=out_dir_losses,
+                              local_loss_only=local_loss_only
                               )
     print('Components in loss ', loss_components_dict)
     wt_geom_loss = None
@@ -357,9 +359,9 @@ def _cli():
         lr_config = dict(learning_rate=float(lr_settings_list[0]),
                             patience=int(lr_settings_list[1]),
                             cooldown=int(lr_settings_list[2]))
-        if not args.use_local_loss_only:
-            warnings.warn('--use_local_loss_only not given.\
-                            For best results, please use this option.')
+        if args.use_global_loss:
+            warnings.warn('--use_global_loss given.\
+                            Results not guaranteed. See command line help')
         run_hallucination(model_file,
                         loss_weights_for_run,
                         outdir=args.prefix,
@@ -381,7 +383,8 @@ def _cli():
                         seed_with_WT=args.seed_with_WT,
                         apply_lr_scheduler=args.apply_lr_scheduler,
                         lr_dict=lr_config,
-                        pssm=pssm_mat)
+                        pssm=pssm_mat,
+                        local_loss_only=(not args.use_glocal_loss))
 
 
 if __name__ == '__main__':
