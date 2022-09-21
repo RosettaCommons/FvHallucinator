@@ -316,7 +316,6 @@ def compute_immunogenicities(sequences_file, design_indices,
     rank_cols = [col for col in df.columns if col.find('Rank.')!=-1]
     df_sel = df[rank_cols+['ID']]
     df_sel['design'] = [''.join(t.split('_')[:-1]) for t in list(df_sel['ID'])]
-    params = ['min NetMHCII Rank', 'mean NetMHCII Rank']
     df_sel['min NetMHCII Rank'] = df_sel[rank_cols].min(axis=1)
     df_sel['mean NetMHCII Rank'] = df_sel[rank_cols].mean(axis=1)
     df_sel['Set'] = ['Hallucination' for _ in list(df_sel['mean NetMHCII Rank'])]
@@ -378,8 +377,3 @@ def compute_immunogenicities(sequences_file, design_indices,
         plot_developability_param_with_baseline(df_concat, param, outfile=outfile, hue='Set')
     else:
         plot_developability_param(df_sel, param, outfile=outfile)
-
-    
-def run_immunogenecity(seqfile, wt_pdb):
-    indices = [t for t in range(98,108)]
-    compute_immunogenicities(seqfile, indices, wt_pdb=wt_pdb)
