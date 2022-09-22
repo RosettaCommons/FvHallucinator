@@ -3,7 +3,7 @@ The code for [FvHallucinator](https://www.biorxiv.org/content/10.1101/2022.06.06
 
 # Requirements
 FvHallucinator requires python3.6 or higher. For a full list of requirements, see requirements.txt.
-For folding hallucinated sequences, you will additionally need a Pyrosetta license (for installing pyrosetta, use conda)
+For folding hallucinated sequences with DeepAb, you will additionally need a Pyrosetta license (for installing pyrosetta, use conda).
 
 # Getting Started
 Start by setting up a python virtual environment (or conda) with python3.6 or higher
