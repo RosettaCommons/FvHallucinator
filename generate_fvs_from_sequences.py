@@ -1,5 +1,8 @@
 
-import os, argparse, json, glob
+import os
+import argparse
+import json
+import glob
 
 import numpy as np
 import pandas as pd
@@ -16,7 +19,7 @@ from src.hallucination.utils.pyrosetta_utils \
 from src.deepab.models.AbResNet import load_model
 from src.deepab.models.ModelEnsemble import ModelEnsemble
 from src.deepab.build_fv.build_cen_fa \
-  import build_initial_fv, get_cst_file, refine_fv
+    import build_initial_fv, get_cst_file, refine_fv
 from src.deepab.build_fv.utils import migrate_seq_numbering, get_constraint_set_mover
 from src.deepab.build_fv.score_functions import get_sf_fa
 from src.util.pdb import get_pdb_numbering_from_residue_indices, renumber_pdb,\
@@ -28,45 +31,47 @@ from src.hallucination.utils.util\
     comma_separated_chain_indices_to_dict, get_model_file
 from src.hallucination.utils.developability_plots import plot_developability_param
 from src.hallucination.utils.rmsd_plotting_utils import plot_logos_for_design_ids,\
-        get_thresholded_df, plot_cdr_metric_distributions,\
-            mutate_and_get_per_residue_rmsd, mutate_and_get_metrics,\
-                    frscores_vs_rosettascores
+    get_thresholded_df, plot_cdr_metric_distributions,\
+    mutate_and_get_per_residue_rmsd, mutate_and_get_metrics,\
+    frscores_vs_rosettascores
 import torch
 
 init_string = "-mute all -check_cdr_chainbreaks false -detect_disulf true"
 pyrosetta.init(init_string)
 torch.no_grad()
 
+
 def plot_thresholded_logos(df_filtered_lowest,
                            path,
                            indices_hal,
-                           region_metrics, 
-                           thresholds, 
+                           region_metrics,
+                           thresholds,
                            outfile='logo_{}_{}.png'):
     for met, met_thr in zip(region_metrics, thresholds):
-            rms_thresholded = \
-                df_filtered_lowest[df_filtered_lowest[met] < met_thr]
-            threshold_sequence_ids = list(
-                rms_thresholded["design_id"])
-            
-            pdb_file_name = '{}/pdb_{{}}.deepAb.pdb'.format(path)
-            outfile_logo=outfile.format(met.replace(' ', ''), met_thr)
-            plot_logos_for_design_ids(threshold_sequence_ids,
-                                      pdb_file_name,
-                                      indices_hal,
-                                      outfile_logo)
-            
-    rms_thresholded_all = get_thresholded_df(df_filtered_lowest, region_metrics, thresholds)
+        rms_thresholded = \
+            df_filtered_lowest[df_filtered_lowest[met] < met_thr]
+        threshold_sequence_ids = list(
+            rms_thresholded["design_id"])
+
+        pdb_file_name = '{}/pdb_{{}}.deepAb.pdb'.format(path)
+        outfile_logo = outfile.format(met.replace(' ', ''), met_thr)
+        plot_logos_for_design_ids(threshold_sequence_ids,
+                                  pdb_file_name,
+                                  indices_hal,
+                                  outfile_logo)
+
+    rms_thresholded_all = get_thresholded_df(
+        df_filtered_lowest, region_metrics, thresholds)
     threshold_sequence_ids = list(
-                rms_thresholded_all["design_id"])
-    
+        rms_thresholded_all["design_id"])
+
     if len(threshold_sequence_ids) > 0:
         pdb_file_name = '{}/pdb_{{}}.deepAb.pdb'.format(path)
-        outfile_logo=outfile.format('all', '')
+        outfile_logo = outfile.format('all', '')
         plot_logos_for_design_ids(threshold_sequence_ids,
-                                      pdb_file_name,
-                                      indices_hal,
-                                      outfile_logo)
+                                  pdb_file_name,
+                                  indices_hal,
+                                  outfile_logo)
 
 
 def plot_thresholded_metrics(filtered_lowest,
@@ -76,11 +81,15 @@ def plot_thresholded_metrics(filtered_lowest,
     for met, met_thr in zip(region_metrics, thresholds):
         rms_thresholded = \
             filtered_lowest[filtered_lowest[met] < met_thr]
-        plot_cdr_metric_distributions(rms_thresholded, met, met_thr, outfile.format(met, met_thr))
-    
-    rms_thresholded_all = get_thresholded_df(filtered_lowest, region_metrics, thresholds)
-    plot_cdr_metric_distributions(rms_thresholded_all, outfile=outfile.format('all', ''))
+        plot_cdr_metric_distributions(
+            rms_thresholded, met, met_thr, outfile.format(met, met_thr))
+
+    rms_thresholded_all = get_thresholded_df(
+        filtered_lowest, region_metrics, thresholds)
+    plot_cdr_metric_distributions(
+        rms_thresholded_all, outfile=outfile.format('all', ''))
     return rms_thresholded_all
+
 
 def plot_thresholded_perres_metrics(df_perres,
                                     filtered_lowest,
@@ -92,9 +101,10 @@ def plot_thresholded_perres_metrics(df_perres,
             filtered_lowest[filtered_lowest[met] < met_thr]
         threshold_sequence_ids = list(
             rms_thresholded["design_id"])
-        
+
         # perres thresholded
-        df_perres_rms_thr = df_perres[df_perres.design_id.isin(threshold_sequence_ids)]
+        df_perres_rms_thr = df_perres[df_perres.design_id.isin(
+            threshold_sequence_ids)]
         if len(df_perres_rms_thr) < 5:
             continue
         sns.boxplot(data=df_perres_rms_thr, x='Position', y='RMSD')
@@ -107,12 +117,14 @@ def plot_thresholded_perres_metrics(df_perres,
         plt.savefig(outfile.format(met, met_thr), dpi=600, transparent=True)
         plt.close()
 
-    rms_thresholded_all = get_thresholded_df(filtered_lowest, region_metrics, thresholds)
+    rms_thresholded_all = get_thresholded_df(
+        filtered_lowest, region_metrics, thresholds)
     threshold_sequence_ids = list(
-            rms_thresholded_all["design_id"])
-        
+        rms_thresholded_all["design_id"])
+
     # perres thresholded
-    df_perres_rms_thr = df_perres[df_perres.design_id.isin(threshold_sequence_ids)]
+    df_perres_rms_thr = df_perres[df_perres.design_id.isin(
+        threshold_sequence_ids)]
     if len(df_perres_rms_thr) > 5:
         sns.boxplot(data=df_perres_rms_thr, x='Position', y='RMSD')
         plt.xticks(rotation=45)
@@ -126,16 +138,19 @@ def plot_thresholded_perres_metrics(df_perres,
 
 
 def seek_and_plot_frscores(rosetta_scorefile, wt_rosetta_scorefile):
-    
-    path_hal_results = os.path.join(os.path.dirname(os.path.dirname(wt_rosetta_scorefile)), 'results')
+
+    path_hal_results = os.path.join(os.path.dirname(
+        os.path.dirname(wt_rosetta_scorefile)), 'results')
     print(path_hal_results)
     if os.path.exists(path_hal_results):
-        design_fr_scores_file = glob.glob('{}/FRScore_per_design_IG*.csv'.format(path_hal_results))
-        
-        wt_fr_scorefile = glob.glob('{}/FRScore_wt_IG*.npy'.format(path_hal_results))
+        design_fr_scores_file = glob.glob(
+            '{}/FRScore_per_design_IG*.csv'.format(path_hal_results))
+
+        wt_fr_scorefile = glob.glob(
+            '{}/FRScore_wt_IG*.npy'.format(path_hal_results))
         print(design_fr_scores_file)
         print(wt_fr_scorefile)
-        if (len(design_fr_scores_file) == 1) and len(wt_fr_scorefile)==1:
+        if (len(design_fr_scores_file) == 1) and len(wt_fr_scorefile) == 1:
             print(design_fr_scores_file)
             frscores_vs_rosettascores(design_fr_scores_file[0],
                                       rosetta_scorefile,
@@ -146,12 +161,12 @@ def seek_and_plot_frscores(rosetta_scorefile, wt_rosetta_scorefile):
 def _read_stat_files(stat_file, design_pdb_file, indices_hal):
     id = int(stat_file.split('_')[-1].rstrip('.csv'))
     hal_struct_metrics = pd.read_csv(stat_file,
-                                        sep=',',
-                                        names=[
-                                            "Decoy", "Score", "OCD", "H Fr",
-                                            "H1", "H2", "H3", "L Fr", "L1",
-                                            "L2", "L3"
-                                        ])
+                                     sep=',',
+                                     names=[
+                                         "Decoy", "Score", "OCD", "H Fr",
+                                         "H1", "H2", "H3", "L Fr", "L1",
+                                         "L2", "L3"
+                                     ])
     hal_struct_metrics['design_id'] = [
         id for _ in range(len(hal_struct_metrics))
     ]
@@ -159,9 +174,9 @@ def _read_stat_files(stat_file, design_pdb_file, indices_hal):
         0 for _ in range(len(hal_struct_metrics))
     ]
     hal_struct_metrics.at[hal_struct_metrics.idxmin()["Score"],
-                            'Lowest'] = 1
-    sequence_full = get_pdb_chain_seq(design_pdb_file,'H') + \
-                    get_pdb_chain_seq(design_pdb_file, 'L')
+                          'Lowest'] = 1
+    sequence_full = get_pdb_chain_seq(design_pdb_file, 'H') + \
+        get_pdb_chain_seq(design_pdb_file, 'L')
     sequence_indices = ''.join([sequence_full[i] for i in indices_hal])
     hal_struct_metrics['seq'] = [
         sequence_indices for _ in range(len(hal_struct_metrics))
@@ -171,12 +186,12 @@ def _read_stat_files(stat_file, design_pdb_file, indices_hal):
 
 def _read_agg_stat_files(stat_file):
     hal_struct_metrics = pd.read_csv(stat_file,
-                                        sep=',',
-                                        names=[
-                                            "Target", "Score", "OCD", "H Fr",
-                                            "H1", "H2", "H3", "L Fr", "L1",
-                                            "L2", "L3"
-                                        ])
+                                     sep=',',
+                                     names=[
+                                         "Target", "Score", "OCD", "H Fr",
+                                         "H1", "H2", "H3", "L Fr", "L1",
+                                         "L2", "L3"
+                                     ])
     hal_struct_metrics['design_id'] = [
         int(name.split('_')[1]) for name in list(hal_struct_metrics['Target'])
     ]
@@ -191,27 +206,27 @@ def plot_folded_structure_metrics(path,
                                   indices_hal=[],
                                   target_pdb=None
                                   ):
-    
+
     csv_pattern = '{}/{}'.format(path, filename) + '_{}.csv'
-    stat_files = [csv_pattern.format('%03d' %i) for i in range(prev, last)
-                    if os.path.exists(csv_pattern.format('%03d' %i))
-                    ]
+    stat_files = [csv_pattern.format('%03d' % i) for i in range(prev, last)
+                  if os.path.exists(csv_pattern.format('%03d' % i))
+                  ]
     pdb_pattern = '{}/pdb_{{}}.deepAb.pdb'.format(path)
-    ff_pdb_files = [pdb_pattern.format('%03d' %i) for i in range(prev, last)
-                    if os.path.exists(pdb_pattern.format('%03d' %i))]
+    ff_pdb_files = [pdb_pattern.format('%03d' % i) for i in range(prev, last)
+                    if os.path.exists(pdb_pattern.format('%03d' % i))]
     print('{} pdb files found.'.format(len(ff_pdb_files)))
     print('{} stat files found.'.format(len(stat_files)))
     if len(stat_files) < 1:
         raise FileNotFoundError('No files {} found in {}'.format(
             filename, path))
-    
+
     path_results = '{}/results'.format(path)
     os.makedirs(path_results, exist_ok=True)
 
     all_metrics = []
     for sf in stat_files:
         i = int(os.path.basename(sf).split('_')[-1].replace('.csv', ''))
-        ff_pdb_file = pdb_pattern.format('%03d' %i)
+        ff_pdb_file = pdb_pattern.format('%03d' % i)
         hal_struct_metrics = _read_stat_files(sf, ff_pdb_file, indices_hal)
         all_metrics.append(hal_struct_metrics)
 
@@ -221,7 +236,8 @@ def plot_folded_structure_metrics(path,
             path_results,
             'consolidated_metrics_N{}.csv'.format('%03d' % len(stat_files))))
 
-    filtered_lowest = all_metrics_df[all_metrics_df["Lowest"] == 1].reset_index()
+    filtered_lowest = all_metrics_df[all_metrics_df["Lowest"] == 1].reset_index(
+    )
     outfile_csv = os.path.join(
         path_results, 'consolidated_ff_lowest_N{}.csv'.format('%03d' % len(stat_files)))
     print(filtered_lowest)
@@ -230,7 +246,8 @@ def plot_folded_structure_metrics(path,
         path_results, 'consolidated_funnels_N{}.png'.format('%03d' % len(stat_files)))
     xlims = [[0, 5], [0, 1.0], [0., 1.0], [0, 2.0], [0, 2.0], [0, 3.5],
              [0, 2.0], [0, 2.0], [0, 2.0]]
-    region_metrics = ["OCD", "H Fr", "L Fr", "H1", "H2", "H3", "L1", "L2", "L3"]
+    region_metrics = ["OCD", "H Fr", "L Fr",
+                      "H1", "H2", "H3", "L1", "L2", "L3"]
     plt.figure(dpi=300)
     for i, col in enumerate(region_metrics):
         plt.subplot(3, 3, i + 1)
@@ -255,7 +272,7 @@ def plot_folded_structure_metrics(path,
         path_results, 'consolidated_sapscores_N{}.csv'.format('%03d' % len(stat_files)))
     if not os.path.exists(outfile_sap_scores):
         sap_scores = ['{}\t{}\n'.format(pdbfile, get_sapscores(pdbfile, rosetta_indices))
-                    for pdbfile in ff_pdb_files]
+                      for pdbfile in ff_pdb_files]
         open(outfile_sap_scores, 'w').write(''.join(sap_scores))
     else:
         sap_scores = open(outfile_sap_scores, 'r').readlines()
@@ -275,8 +292,9 @@ def plot_folded_structure_metrics(path,
     for agg_sf in agg_stat_files:
         hal_mets = _read_agg_stat_files(agg_sf)
         agg_metrics.append(hal_mets)
-    
-    agg_metrics = pd.concat(agg_metrics).drop_duplicates('design_id').reset_index(drop=True)
+
+    agg_metrics = pd.concat(agg_metrics).drop_duplicates(
+        'design_id').reset_index(drop=True)
     outfile_agg_scores = os.path.join(
         path_results, 'consolidated_funnels_aggregate_N{}.csv'.format('%03d' % len(stat_files)))
     agg_metrics.to_csv(outfile_agg_scores)
@@ -291,7 +309,8 @@ def plot_folded_structure_metrics(path,
         path_results, 'consolidated_funnels_aggregate_N{}.png'.format('%03d' % len(stat_files)))
     xlims = [[0, 5], [0, 1.0], [0., 1.0], [0, 2.0], [0, 2.0], [0, 3.5],
              [0, 2.0], [0, 2.0], [0, 2.0]]
-    region_metrics = ["OCD", "H Fr", "L Fr", "H1", "H2", "H3", "L1", "L2", "L3"]
+    region_metrics = ["OCD", "H Fr", "L Fr",
+                      "H1", "H2", "H3", "L1", "L2", "L3"]
     plt.figure(dpi=300)
     for i, col in enumerate(region_metrics):
         plt.subplot(3, 3, i + 1)
@@ -315,19 +334,20 @@ def plot_folded_structure_metrics(path,
     outfile = os.path.join(
         path_results, 'dist_TotalScore_N{}.png'.format('%03d' % len(stat_files)))
     theme = {'axes.grid': True,
-            'grid.linestyle': '',
-            'xtick.labelsize': 18,
-            'ytick.labelsize': 18,
-            "font.weight": 'regular',
-            'xtick.color': 'black',
-            'ytick.color': 'black',
-            "axes.titlesize": 20,
-            "axes.labelsize": 18
-        }
+             'grid.linestyle': '',
+             'xtick.labelsize': 18,
+             'ytick.labelsize': 18,
+             "font.weight": 'regular',
+             'xtick.color': 'black',
+             'ytick.color': 'black',
+             "axes.titlesize": 20,
+             "axes.labelsize": 18
+             }
     import matplotlib
     matplotlib.rcParams.update(theme)
-    fig = plt.figure(figsize=(5,4))
-    sns.histplot(data=agg_metrics, x='Score', stat="count", color='darkblue',binwidth=3.0)
+    fig = plt.figure(figsize=(5, 4))
+    sns.histplot(data=agg_metrics, x='Score', stat="count",
+                 color='darkblue', binwidth=3.0)
     if target_pdb is not None:
         plt.axvline(score_wt, ls='--', lw=2.0, c='black', zorder=1)
     ax = plt.gca()
@@ -340,11 +360,11 @@ def plot_folded_structure_metrics(path,
     plt.close()
 
     seek_and_plot_frscores(outfile_agg_scores, outfile_wt_score)
-    
+
     outfile = os.path.join(
         path_results, 'consolidated_dist_N{}.png'.format('%03d' % len(stat_files)))
     plot_cdr_metric_distributions(filtered_lowest, outfile=outfile)
-    
+
     if indices_hal != []:
         pdb_file_name = '{}/pdb_*.deepAb.pdb'.format(path)
         pdb_files = glob.glob(pdb_file_name)
@@ -352,14 +372,15 @@ def plot_folded_structure_metrics(path,
         labellist = indices_hal
         if len(pdb_files) != 0:
             labellist = \
-            get_pdb_numbering_from_residue_indices(pdb_files[0], indices_hal)
+                get_pdb_numbering_from_residue_indices(
+                    pdb_files[0], indices_hal)
         dict_residues.update({'labellist': labellist})
 
         # plot per-residues distributions
         csv_pattern = '{}/'.format(path) + 'perresiduermsd_*.csv'
         files = glob.glob(csv_pattern)
         if len(files) != 0:
-            
+
             df_list = []
             for f in files:
                 try:
@@ -370,17 +391,19 @@ def plot_folded_structure_metrics(path,
                     continue
             if df_list != []:
                 df_concat = pd.concat(df_list, ignore_index=True)
-                df_perres = pd.melt(df_concat, id_vars=['pdb_name'], 
-                value_vars=labellist, var_name='Position', value_name='RMSD', ignore_index=False)
-                df_perres['design_id'] = [int(name.split('_')[1]) for name in list(df_perres['pdb_name'])]
+                df_perres = pd.melt(df_concat, id_vars=['pdb_name'],
+                                    value_vars=labellist, var_name='Position', value_name='RMSD', ignore_index=False)
+                df_perres['design_id'] = [
+                    int(name.split('_')[1]) for name in list(df_perres['pdb_name'])]
                 ax = sns.boxplot(data=df_perres, x='Position', y='RMSD')
                 plt.xticks(rotation=45)
                 plt.ylabel(r'RMSD ($\AA$)')
                 plt.tight_layout()
                 outfile = os.path.join(
-                path_results, 'consolidated_perres_boxplot_N{}.png'.format('%03d' % len(stat_files)))
+                    path_results, 'consolidated_perres_boxplot_N{}.png'.format('%03d' % len(stat_files)))
                 plt.savefig(outfile, dpi=600, transparent=True)
                 plt.close()
+
 
 def refine_fv_(mds_pdb_file, decoy_pdb_file, cst_file):
     import pyrosetta
@@ -396,9 +419,10 @@ def refine_fv_(mds_pdb_file, decoy_pdb_file, cst_file):
             return score
 
         return refine_fv(mds_pdb_file, decoy_pdb_file, cst_file)
-    
+
     except:
         return 100.0
+
 
 def renumber_from_target(pdb_file, native_pdb_file, renumbered_file):
     native_pose = pyrosetta.pose_from_pdb(native_pdb_file)
@@ -422,7 +446,7 @@ def build_structure(model,
 
     cst_file = os.path.join(constraint_dir, "hb_csm", "constraints.cst")
     cst_file = get_cst_file(model, fasta_file, constraint_dir)
-    
+
     out_dir_int = os.path.join(out_dir, 'intermediate')
     if not os.path.exists(out_dir_int):
         os.makedirs(out_dir_int, exist_ok=True)
@@ -500,10 +524,11 @@ def generate_pdb_from_model(sequences_file,
         ''.join(sequences_fasta[i:i + 4])
         for i in range(0, len(sequences_fasta), 4)
     ]
-    
+
     start_seq = min([start_from, len(sequences_fasta_hl)])
     end_seq = min([last, len(sequences_fasta_hl)])
-    ids = [int(t.split('_')[1]) for t in sequences_fasta if (t.find('>') !=-1) and (t.find(':H') !=-1)]
+    ids = [int(t.split('_')[1]) for t in sequences_fasta if (
+        t.find('>') != -1) and (t.find(':H') != -1)]
     dsequences = {}
     assert len(ids) == len(sequences_fasta_hl)
     for id, seq in zip(ids, sequences_fasta_hl):
@@ -521,7 +546,7 @@ def generate_pdb_from_model(sequences_file,
         deepab_pdb_file = os.path.join(out_dir_ff,
                                        '{}.deepAb.pdb'.format(target))
         if not os.path.exists(deepab_pdb_file):
-            #skip files already processed.
+            # skip files already processed.
             build_structure(model,
                             fasta_file,
                             out_dir_ff,
@@ -540,15 +565,16 @@ def generate_pdb_from_model(sequences_file,
 
         all_metrics.append(rmsd_metrics_all)
         all_per_residue_rmsds.append(rmsd_metrics_perres)
-    
+
     # all metrics for best decoy
     if not target_pdb is None:
         stats_file = os.path.join(out_dir_ff,
-                                "stats_{}-{}.csv".format(start_seq, end_seq))
+                                  "stats_{}-{}.csv".format(start_seq, end_seq))
         np.savetxt(stats_file, all_metrics, delimiter=',', fmt="%s")
         stats_res_file = os.path.join(out_dir_ff,
-                                "perresiduermsd_{}-{}.csv".format(start_seq, end_seq))
-        np.savetxt(stats_res_file, all_per_residue_rmsds, delimiter=',', fmt="%s")
+                                      "perresiduermsd_{}-{}.csv".format(start_seq, end_seq))
+        np.savetxt(stats_res_file, all_per_residue_rmsds,
+                   delimiter=',', fmt="%s")
 
 
 def get_rmsd_metrics_for_pdb(pdb_file,
@@ -562,28 +588,29 @@ def get_rmsd_metrics_for_pdb(pdb_file,
                              ff_suffix='deepAb',
                              relax_design=False
                              ):
-        
+
     pose = pyrosetta.pose_from_pdb(pdb_file)
     native_pose = pyrosetta.pose_from_pdb(target_pdb)
 
     # lowest scoring decoy score and metrics
     metrics = mutate_and_get_metrics(native_pose, pose, indices_hal)
     if per_residue_metrics:
-        per_residue_rmsd = mutate_and_get_per_residue_rmsd(native_pose, pose, indices_hal)
-    
+        per_residue_rmsd = mutate_and_get_per_residue_rmsd(
+            native_pose, pose, indices_hal)
+
     # This part of the loop can be skipped
     # get metrics for all decoys
     if intermediate_metrics:
         decoy_pdb_pattern = os.path.join(
             out_dir_ff, "intermediate/{}.{}.{{}}.pdb".format(target, ff_suffix))
-        #read scores from relax stats file
+        # read scores from relax stats file
         decoy_stats_file = os.path.join(
             out_dir_ff, "intermediate/stats_{}.csv".format(target))
         decoy_scores = np.genfromtxt(decoy_stats_file,
-                                    delimiter=",",
-                                    dtype=float)[:, 1]
+                                     delimiter=",",
+                                     dtype=float)[:, 1]
 
-        #get antibody related metrics; append scores
+        # get antibody related metrics; append scores
         decoy_metrics = []
         for i in range(num_decoys):
             decoy_score_rosetta = score_pdb(decoy_pdb_pattern.format(i))
@@ -593,10 +620,10 @@ def get_rmsd_metrics_for_pdb(pdb_file,
 
         # overwriting decoy stats file with updated metrics
         np.savetxt(decoy_stats_file,
-                np.asarray(decoy_metrics),
-                delimiter=",",
-                fmt="%s")
-    
+                   np.asarray(decoy_metrics),
+                   delimiter=",",
+                   fmt="%s")
+
     score = score_pdb(pdb_file, relax=relax_design)
 
     if per_residue_metrics:
@@ -631,9 +658,8 @@ def get_args():
     parser.add_argument(
         'designed_seq_file',
         type=str,
-        help=
-        'Sequence file from process_designs.py (sequences_indices.fasta for complex generation;\
-                        sequences.fasta for antibody only generation'                                                                     )
+        help='Sequence file from process_designs.py (sequences_indices.fasta for complex generation;\
+                        sequences.fasta for antibody only generation')
     parser.add_argument(
         '--path_forward_folded',
         type=str,
@@ -643,19 +669,19 @@ def get_args():
                         action='store_true',
                         default=False,
                         help='Make mutations to target pdb from sequence file,\
-                             relax interface, calc dG, get best dG designs'                                                                             )
+                             relax interface, calc dG, get best dG designs')
     parser.add_argument('--pdbs_from_model',
                         action='store_true',
                         default=False,
                         help='Forward fold full Ab from full sequence designs\
-                           file with DeepAb/H3 model.'                                                      )
+                           file with DeepAb/H3 model.')
     parser.add_argument('--plot_consolidated_funnels',
                         action='store_true',
                         default=False,
                         help='plot all forward folded structures in the\
                              same funnel plot from forward folding runs\
                              file with DeepAb/H3 model. Must provide path\
-                             for forward folding dir'                                                     )
+                             for forward folding dir')
     parser.add_argument(
         '--plot_consolidated_dG',
         action='store_true',
@@ -688,7 +714,7 @@ def get_args():
                         )
     parser.add_argument('--csv_forward_folded',
                         default='',
-                        help='csv file generated by --plot_consolidated_funnels'\
+                        help='csv file generated by --plot_consolidated_funnels'
                         )
     parser.add_argument('--csv_complexes',
                         default='',
@@ -756,7 +782,7 @@ def get_args():
                         default='',
                         help='Specify complex chains: Eg. HL_X; \
                               where HL chains form one interacting partner\
-                              and X the other'                                              )
+                              and X the other')
     parser.add_argument('--dry_run',
                         action='store_true',
                         default=False,
@@ -789,12 +815,12 @@ def get_args():
                         action='store_true',
                         default=False,
                         help='Additional relax of DeepAb folded designs - slow - skip unless evaluating HL interface')
-    
+
     return parser.parse_args()
 
 
 def get_hal_indices(args):
-    
+
     dict_indices = {}
     dict_exclude = {}
     if args.indices != '':
@@ -806,12 +832,12 @@ def get_hal_indices(args):
         dict_exclude = comma_separated_chain_indices_to_dict(indices_str)
 
     indices_hal = get_indices_from_different_methods(
-        args.target_pdb, \
-        cdr_list=args.cdr_list, \
-        framework=args.framework, \
-        hl_interface=args.hl_interface, \
-        include_indices=dict_indices, \
-        exclude_indices=dict_exclude )
+        args.target_pdb,
+        cdr_list=args.cdr_list,
+        framework=args.framework,
+        hl_interface=args.hl_interface,
+        include_indices=dict_indices,
+        exclude_indices=dict_exclude)
     print("Indices hallucinated: ", indices_hal)
     return indices_hal
 
@@ -824,14 +850,16 @@ if __name__ == '__main__':
         scratch_dir = os.path.join(args.scratch_space)
         os.system("mkdir -p {}".format(scratch_dir))
         use_cluster_decoy = True
-        config_dict = json.load(open(args.slurm_cluster_config,'r'))
+        config_dict = json.load(open(args.slurm_cluster_config, 'r'))
         cluster = SLURMCluster(**config_dict,
-                                local_directory=scratch_dir,
-                                job_extra=[
-                "-o {}".format(os.path.join(scratch_dir, "slurm-%j.out"))
-            ],
-            extra=pyrosetta.distributed.dask.worker_extra(init_flags=init_string)
-            )
+                               local_directory=scratch_dir,
+                               job_extra=[
+                                   "-o {}".format(os.path.join(scratch_dir,
+                                                  "slurm-%j.out"))
+                               ],
+                               extra=pyrosetta.distributed.dask.worker_extra(
+                                   init_flags=init_string)
+                               )
         print(cluster.job_script())
         cluster.adapt(minimum_jobs=min(args.decoys, 2),
                       maximum_jobs=min(args.decoys, args.slurm_scale))
@@ -852,7 +880,7 @@ if __name__ == '__main__':
 
     if args.pdbs_from_model:
         model_files = get_model_file(args.model)
-        if args.target_pdb=='None':
+        if args.target_pdb == 'None':
             target_pdb = None
             indices_hal = []
         else:

@@ -1,36 +1,32 @@
 
-import os, subprocess
+from src.hallucination.utils.loss_plotting_utils import plot_all_losses
+from src.hallucination.utils.command_line_utils import _get_args
+from src.hallucination.utils.util import get_model_file,\
+    comma_separated_chain_indices_to_dict,\
+    get_indices_from_different_methods,\
+    convert_chain_aa_to_index_aa_map
+from src.hallucination.loss.setup_losses import setup_loss_components,\
+    setup_loss_weights,\
+    get_reference_losses,\
+    debug_wt_losses
+from src.hallucination.SequenceHallucinator import SequenceHallucinator
+from src.util.preprocess import bin_value_matrix
+from src.util.pdb import get_pdb_chain_seq, \
+    protein_pairwise_geometry_matrix
+from src.util.masking import mask_from_indices_list
+from src.util.get_bins import get_dist_bins, get_dihedral_bins, get_planar_bins
+from src.deepab.models.ModelEnsemble import ModelEnsemble
+from src.util.util import _aa_dict
+import json
+import warnings
+from tqdm import tqdm
+import numpy as np
+import torch
+import matplotlib.pyplot as plt
+import os
 import argparse
 import matplotlib
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-
-import torch
-import numpy as np
-from tqdm import tqdm
-import warnings
-import json
-
-from src.util.util import _aa_dict
-from src.deepab.models.ModelEnsemble import ModelEnsemble
-from src.util.get_bins import get_dist_bins, get_dihedral_bins, get_planar_bins
-from src.util.masking import mask_from_indices_list
-from src.util.pdb import get_pdb_chain_seq, \
-                            protein_pairwise_geometry_matrix
-from src.util.preprocess import bin_value_matrix
-from src.hallucination.SequenceHallucinator import SequenceHallucinator
-from src.hallucination.loss.setup_losses import setup_loss_components,\
-                                                   setup_loss_weights,\
-                                                   get_reference_losses,\
-                                                   debug_wt_losses
-from src.hallucination.utils.util import  get_model_file,\
-                                      comma_separated_chain_indices_to_dict,\
-                                      get_indices_from_different_methods,\
-                                      convert_chain_aa_to_index_aa_map
-
-
-from src.hallucination.utils.command_line_utils import _get_args
-from src.hallucination.utils.loss_plotting_utils import plot_all_losses
 
 
 def load_model_from_dict(model_files,
@@ -46,14 +42,14 @@ def load_model_from_dict(model_files,
 
 def get_target_geometries(target_pdb):
     bin_getter = [get_dist_bins, get_dihedral_bins, get_planar_bins]
-    n_bin_types=[3, 2, 1]
-    out_bins=[37, 36, 36]
+    n_bin_types = [3, 2, 1]
+    out_bins = [37, 36, 36]
     bins = [
         bg(ob) for bg, bt, ob in zip(bin_getter, n_bin_types, out_bins)
         for _ in range(bt)
     ]
     target_geometries = [
-            g for g in protein_pairwise_geometry_matrix(pdb_file=target_pdb)]
+        g for g in protein_pairwise_geometry_matrix(pdb_file=target_pdb)]
     target_geometries = [
         bin_value_matrix(g, b) for g, b in zip(target_geometries, bins)
     ]
@@ -80,7 +76,8 @@ def run_hallucination(model_path,
                       autostop=True,
                       seed_with_WT=False,
                       apply_lr_scheduler=True,
-                      lr_dict={'learning_rate':0.05, 'patience':20, 'cooldown':10},
+                      lr_dict={'learning_rate': 0.05,
+                               'patience': 20, 'cooldown': 10},
                       pssm=None,
                       local_loss_only=True
                       ):
@@ -99,22 +96,22 @@ def run_hallucination(model_path,
     target_geometries = get_target_geometries(target_pdb)
 
     wt_heavy_seq, wt_light_seq = get_pdb_chain_seq(target_pdb,
-                                                'H'), get_pdb_chain_seq(
-                                                    target_pdb, 'L')
+                                                   'H'), get_pdb_chain_seq(
+        target_pdb, 'L')
     # Collect indices of positions to hallucinate
     indices_hal = get_indices_from_different_methods(target_pdb, cdr_list=cdr_list,
-                                                    framework=framework, 
-                                                    hl_interface=hl_interface,
-                                                    include_indices=include_indices,
-                                                    exclude_indices=exclude_indices)
+                                                     framework=framework,
+                                                     hl_interface=hl_interface,
+                                                     include_indices=include_indices,
+                                                     exclude_indices=exclude_indices)
 
     wt_seq = wt_heavy_seq + wt_light_seq
 
     out_dir_losses = os.path.join(outdir, 'losses')
     os.makedirs(out_dir_losses, exist_ok=True)
-    outnpy = os.path.join(out_dir_losses,"lossgeomfull_wt.npy".format(suffix))
+    outnpy = os.path.join(out_dir_losses, "lossgeomfull_wt.npy".format(suffix))
     list_wt_mask = debug_wt_losses(wt_seq, wt_heavy_seq, model, target_geometries,
-                    device, outnpy)
+                                   device, outnpy)
     seq_design_mask = mask_from_indices_list(indices_hal, len(wt_seq))
     os.makedirs(outdir, exist_ok=True)
     mask_2d = seq_design_mask.unsqueeze(1).expand(-1, 10)
@@ -123,8 +120,8 @@ def run_hallucination(model_path,
     plt.savefig('{}/design_mask.png'.format(outdir))
     plt.close()
     non_design_mask = None
-    seq_for_hal = ''.join(['*' if i in indices_hal\
-                                else t for i,t in enumerate(wt_seq)])
+    seq_for_hal = ''.join(['*' if i in indices_hal
+                           else t for i, t in enumerate(wt_seq)])
     # seeding with WT sequence
     if seed_with_WT:
         sequence_seed = wt_seq
@@ -150,7 +147,6 @@ def run_hallucination(model_path,
         print('Positions with restricted AA at Indices: ',
               restricted_dict_keep_aas_indexed)
 
-
     out_dir_losses = os.path.join(outdir, 'losses')
     os.makedirs(out_dir_losses, exist_ok=True)
     loss_components, loss_components_dict = \
@@ -174,7 +170,7 @@ def run_hallucination(model_path,
         wt_geom_loss, _ = get_reference_losses(wt_seq, wt_heavy_seq, model,
                                                loss_components, device,
                                                loss_components_dict)
-    
+
     seq_design_mask = mask_from_indices_list(indices_hal, len(seq_for_hal))
     sequence_hallucinator = SequenceHallucinator(
         wt_seq,
@@ -199,11 +195,12 @@ def run_hallucination(model_path,
 
     for itr in tqdm(range(max_iters)):
 
-        list_losses = sequence_hallucinator.update_sequence(disallow_letters=disallowed_aas)
-        
+        list_losses = sequence_hallucinator.update_sequence(
+            disallow_letters=disallowed_aas)
+
         if itr == 0:
             sequence_hallucinator.write_sequence_history_file(
-            os.path.join(out_dir_int, "sequences_{}_init.fasta".format(suffix)))
+                os.path.join(out_dir_int, "sequences_{}_init.fasta".format(suffix)))
 
         for key in traj_loss_dict:
             if key != 'reg_seq':
@@ -219,7 +216,7 @@ def run_hallucination(model_path,
             print(sequence_hallucinator.lr, sequence_hallucinator.start_lr)
             if sequence_hallucinator.start_lr / float(
                 sequence_hallucinator.lr
-                ) >= 100.0:
+            ) >= 100.0:
                 print(
                     "Stopping at {} because learning rate has reached {} at iter {}"
                     .format(itr, sequence_hallucinator.lr, itr))
@@ -234,7 +231,7 @@ def run_hallucination(model_path,
                                    "loss_{{}}_{}_{}.png".format(suffix, itr))
             plot_all_losses(traj_loss_dict, outfile,
                             max_iters, wt_geom_loss)
-            
+
     # Write trajectory sequences
     sequence_hallucinator.write_sequence_history_file(
         os.path.join(out_dir_trajs, "sequences_{}_final.fasta".format(suffix)))
@@ -244,7 +241,7 @@ def run_hallucination(model_path,
                                     "lossdict_{}_final.npy".format(suffix))
     np.save(outfile_loss_mat, traj_loss_dict)
 
-    #Plot losses
+    # Plot losses
     outfile = os.path.join(out_dir_losses,
                            "loss_{{}}_{}_final.png".format(suffix))
     plot_all_losses(traj_loss_dict, outfile,
@@ -304,7 +301,7 @@ def _cli():
         dict_exclude = comma_separated_chain_indices_to_dict(args.exclude)
 
     if args.restrict_positions_to_freq != '' and args.restrict_positions_to_aas != '' and \
-        args.restrict_positions_to_aas_except != '':
+            args.restrict_positions_to_aas_except != '':
         raise argparse.ArgumentError.message('--restrict_positions_to_freq or \
             --restrict_positions_to_aas or \
             --restrict_positions_to_aas_except \
@@ -321,30 +318,30 @@ def _cli():
         if os.path.exists(args.apply_distribution_from_pssm):
             pssm_mat = np.load(args.apply_distribution_from_pssm)
 
-
     if args.restrict_positions_to_aas != '':
         restricted_dict_keep_aas = _indstr_to_dictlist_keep_aas(
             args.restrict_positions_to_aas)
-        
+
     if args.restrict_positions_to_aas_except != '':
         restricted_dict_keep_aas = _indstr_to_dictlist_keep_aas(
             args.restrict_positions_to_aas_except, except_aas=True)
-        
+
     disallowed_aas = ''
     if args.disallow_aas_at_all_positions != '':
         disallowed_aas = args.disallow_aas_at_all_positions
         for aa in disallowed_aas:
             assert aa in _aa_dict
-        
+
     model_file = get_model_file(args.model)
     loss_weights_for_run = setup_loss_weights(args)
 
     out_dir = args.prefix
     # Only run if the output file does not exist yet:
     expected_final_outfile = os.path.join(
-        out_dir, 'trajectories',"sequences_{}_final.fasta".format(args.suffix))
+        out_dir, 'trajectories', "sequences_{}_final.fasta".format(args.suffix))
     if os.path.exists(expected_final_outfile) and args.overwrite == False:
-        print('Final fasta already exists. Not overwriting ', expected_final_outfile)
+        print('Final fasta already exists. Not overwriting ',
+              expected_final_outfile)
         pass
     else:
         os.makedirs(out_dir, exist_ok=True)
@@ -355,34 +352,34 @@ def _cli():
 
         lr_settings_list = [t for t in args.lr_settings.split(',')]
         lr_config = dict(learning_rate=float(lr_settings_list[0]),
-                            patience=int(lr_settings_list[1]),
-                            cooldown=int(lr_settings_list[2]))
+                         patience=int(lr_settings_list[1]),
+                         cooldown=int(lr_settings_list[2]))
         if args.use_global_loss:
             warnings.warn('--use_global_loss given.\
                             Results not guaranteed. See command line help')
         run_hallucination(model_file,
-                        loss_weights_for_run,
-                        outdir=args.prefix,
-                        target_pdb=args.target_pdb,
-                        cdr_list=args.cdr_list,
-                        framework=args.framework,
-                        include_indices=dict_indices,
-                        exclude_indices=dict_exclude,
-                        hl_interface=args.hl_interface,
-                        max_iters=args.iterations,
-                        suffix=args.suffix,
-                        seed=args.seed,
-                        n_every=args.n_every,
-                        restricted_positions_aa_freq=restricted_dict,
-                        restricted_dict_keep_aas=restricted_dict_keep_aas,
-                        disallowed_aas=disallowed_aas,
-                        use_manual_seed=(not args.random_seed),
-                        autostop=(not args.disable_autostop),
-                        seed_with_WT=args.seed_with_WT,
-                        apply_lr_scheduler=(not args.disable_lr_scheduler),
-                        lr_dict=lr_config,
-                        pssm=pssm_mat,
-                        local_loss_only=(not args.use_global_loss))
+                          loss_weights_for_run,
+                          outdir=args.prefix,
+                          target_pdb=args.target_pdb,
+                          cdr_list=args.cdr_list,
+                          framework=args.framework,
+                          include_indices=dict_indices,
+                          exclude_indices=dict_exclude,
+                          hl_interface=args.hl_interface,
+                          max_iters=args.iterations,
+                          suffix=args.suffix,
+                          seed=args.seed,
+                          n_every=args.n_every,
+                          restricted_positions_aa_freq=restricted_dict,
+                          restricted_dict_keep_aas=restricted_dict_keep_aas,
+                          disallowed_aas=disallowed_aas,
+                          use_manual_seed=(not args.random_seed),
+                          autostop=(not args.disable_autostop),
+                          seed_with_WT=args.seed_with_WT,
+                          apply_lr_scheduler=(not args.disable_lr_scheduler),
+                          lr_dict=lr_config,
+                          pssm=pssm_mat,
+                          local_loss_only=(not args.use_global_loss))
 
 
 if __name__ == '__main__':

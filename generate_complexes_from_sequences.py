@@ -1,6 +1,9 @@
 
 from importlib_metadata import sys, warnings
-import os, argparse, json, glob
+import os
+import argparse
+import json
+import glob
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -21,10 +24,10 @@ from src.hallucination.utils.util\
     comma_separated_chain_indices_to_dict
 from src.hallucination.utils.interfacemetrics_plotting_utils \
     import iam_score_df_from_pdbs, plot_scores_and_select_designs, scatter_hist,\
-         select_best_designs_by_sum
+    select_best_designs_by_sum
 from src.hallucination.utils.sequence_utils import sequences_to_logo_without_weblogo
 from src.hallucination.utils.rmsd_plotting_utils import threshold_by_rmsd_filters,\
-                write_fastas_for_alphafold2, plt_ff_publication_for_run
+    write_fastas_for_alphafold2, plt_ff_publication_for_run
 
 init_string = "-mute all -check_cdr_chainbreaks false -detect_disulf true"
 pyrosetta.init(init_string)
@@ -32,18 +35,18 @@ pyrosetta.init(init_string)
 
 def plot_dG(df_dg, outfile, min_base_dg=None):
     theme = {'axes.grid': True,
-            'grid.linestyle': '',
-            'xtick.labelsize': 18,
-            'ytick.labelsize': 18,
-            "font.weight": 'regular',
-            'xtick.color': 'black',
-            'ytick.color': 'black',
-            "axes.titlesize": 20,
-            "axes.labelsize": 18
-        }
+             'grid.linestyle': '',
+             'xtick.labelsize': 18,
+             'ytick.labelsize': 18,
+             "font.weight": 'regular',
+             'xtick.color': 'black',
+             'ytick.color': 'black',
+             "axes.titlesize": 20,
+             "axes.labelsize": 18
+             }
     import matplotlib
     matplotlib.rcParams.update(theme)
-    fig = plt.figure(figsize=(5,4))
+    fig = plt.figure(figsize=(5, 4))
     sns.histplot(data=df_dg, x='dG', stat="probability")
     if min_base_dg is not None:
         plt.axvline(min_base_dg, ls='--', lw=2.0, c='black', zorder=1)
@@ -56,7 +59,7 @@ def plot_dG(df_dg, outfile, min_base_dg=None):
     plt.savefig(outfile, transparent=True, dpi=600)
     plt.close()
 
-    fig = plt.figure(figsize=(5,4))
+    fig = plt.figure(figsize=(5, 4))
     df_dg_neg = df_dg[df_dg['dG'] < -10.0]
     sns.histplot(data=df_dg_neg, x='dG', stat="probability")
     if min_base_dg is not None:
@@ -72,7 +75,7 @@ def plot_dG(df_dg, outfile, min_base_dg=None):
                 dpi=600)
     plt.close()
 
-    fig = plt.figure(figsize=(5,4))
+    fig = plt.figure(figsize=(5, 4))
     df_dg_neg = df_dg[df_dg['dG'] < -10.0]
     sns.histplot(data=df_dg_neg, x='dG', stat="count")
     if min_base_dg is not None:
@@ -104,7 +107,7 @@ def compile_and_plot_results(basename_data,
         json.loads(open(seq_dict, 'r').read()) for seq_dict in seq_dict_files
     ]
 
-    dfs = [pd.DataFrame.from_dict(seq_dict, orient='index') \
+    dfs = [pd.DataFrame.from_dict(seq_dict, orient='index')
            for seq_dict in seq_dicts]
 
     df_dg = pd.concat(dfs)
@@ -115,14 +118,13 @@ def compile_and_plot_results(basename_data,
     outfile_df = os.path.join(basename_results,
                               'dg_min_{}-{}.csv'.format(prev, last))
     df_dg.to_csv(outfile_df, ',')
-    
 
     dict_pattern = '{}/all_decoys_{{}}.json'.format(basename_data)
     seq_dict_files = [
         dict_pattern.format(i) for i in range(prev, last)
         if os.path.exists(dict_pattern.format(i))
     ]
-    dfs = [pd.DataFrame.from_dict(json.loads(open(seq_dict, 'r').read()), orient='index') \
+    dfs = [pd.DataFrame.from_dict(json.loads(open(seq_dict, 'r').read()), orient='index')
            for seq_dict in seq_dict_files]
 
     df_all = pd.concat(dfs)
@@ -132,7 +134,7 @@ def compile_and_plot_results(basename_data,
     df_all.to_csv(outfile_df, ',')
 
     outfile_dg_plot = os.path.join(basename_results,
-                                    'dg_hist_{}-{}.png'.format(prev, last))
+                                   'dg_hist_{}-{}.png'.format(prev, last))
 
     if os.path.exists(wt_dG):
         wt_dG_dict = json.loads(open(wt_dG, 'r').read())
@@ -143,7 +145,7 @@ def compile_and_plot_results(basename_data,
         dg_worse = df_dg[df_dg['dG'] > (wt_dg_value + 5)]
 
         dg_improved_sorted = dg_improved.sort_values(by='dG',
-                                                       ascending=True)
+                                                     ascending=True)
         outfile_improved = os.path.join(
             basename_results,
             'improved_dG_sequences_{}-{}.csv'.format(prev, last))
@@ -151,7 +153,7 @@ def compile_and_plot_results(basename_data,
             f.write('filename,dG,seq\n')
             for _, row in dg_improved_sorted.iterrows():
                 f.write('{},{},{}\n'.format(row['pdb'], row['dG'],
-                                              row['seq']))
+                                            row['seq']))
 
         plot_dG(df_dg, outfile_dg_plot, wt_dg_value)
     else:
@@ -171,10 +173,10 @@ def compile_and_plot_results(basename_data,
             outfile = os.path.join(
                 basename_results,
                 'logo_dG_improved_threshold{}_{}-{}.png'.format(wt_dg_value + 5, prev,
-                                                    last))
+                                                                last))
             sequences_to_logo_without_weblogo(seq_slices,
-                                          dict_residues,
-                                          outfile_logo=outfile)
+                                              dict_residues,
+                                              outfile_logo=outfile)
         seq_slices = list(dg_worse["seq"])
         if len(seq_slices) > 0:
             assert len(seq_slices[0]) == len(indices_hal)
@@ -182,10 +184,10 @@ def compile_and_plot_results(basename_data,
             outfile = os.path.join(
                 basename_results,
                 'logo_dG_worse_threshold{}_{}-{}.png'.format(wt_dg_value + 5, prev,
-                                                    last))
+                                                             last))
             sequences_to_logo_without_weblogo(seq_slices,
-                                          dict_residues,
-                                          outfile_logo=outfile)
+                                              dict_residues,
+                                              outfile_logo=outfile)
 
 
 def output_filtered_designs(csv_dg, csv_rmsd,
@@ -193,32 +195,38 @@ def output_filtered_designs(csv_dg, csv_rmsd,
                             indices_hal=[],
                             rmsd_filter='H3,1.8',
                             rmsd_filter_json='',
-                            outdir='.', 
+                            outdir='.',
                             suffix='DeepAb'
                             ):
     os.makedirs(outdir, exist_ok=True)
     df_dg = pd.read_csv(csv_dg, delimiter=',')
     df_dg['design_id'] = \
-        [int(os.path.basename(t).split('.pdb')[0].split('_')[-2]) 
+        [int(os.path.basename(t).split('.pdb')[0].split('_')[-2])
             for t in list(df_dg['filename'])]
     df_ff = pd.read_csv(csv_rmsd)
-    if rmsd_filter !='':
-        x=rmsd_filter.split(',')[0]
-        outfile_png = os.path.join(outdir, 'histrmsdff-{}.png'.format(suffix))                                          
+    if rmsd_filter != '':
+        x = rmsd_filter.split(',')[0]
+        outfile_png = os.path.join(outdir, 'histrmsdff-{}.png'.format(suffix))
         plt_ff_publication_for_run(csv_rmsd, x=x, outfile=outfile_png)
-    outfile = os.path.join(outdir, 'df_ff-{}_thresholded_{{}}.csv'.format(suffix))
+    outfile = os.path.join(
+        outdir, 'df_ff-{}_thresholded_{{}}.csv'.format(suffix))
     df_ff_thr, rmsd_suffix = threshold_by_rmsd_filters(df_ff, rmsd_filter=rmsd_filter,
-                                              rmsd_filter_json=rmsd_filter_json,
-                                              outfile=outfile)
-    df_dg_ff_thr = pd.merge(df_dg, df_ff_thr, on=['design_id'], suffixes=['', '_ff'])
-    outfile = os.path.join(outdir, 'df_ff-{}_dg_thresholded_{}.csv'.format(suffix, rmsd_suffix))
+                                                       rmsd_filter_json=rmsd_filter_json,
+                                                       outfile=outfile)
+    df_dg_ff_thr = pd.merge(df_dg, df_ff_thr, on=[
+                            'design_id'], suffixes=['', '_ff'])
+    outfile = os.path.join(
+        outdir, 'df_ff-{}_dg_thresholded_{}.csv'.format(suffix, rmsd_suffix))
     df_dg_ff_thr.to_csv(outfile)
-    outfile_png = os.path.join(outdir, 'df_ff-{}_thresholded_{}.png'.format(suffix, rmsd_suffix))
-    if rmsd_filter !='':
-        x=rmsd_filter.split(',')[0]
-        outfile_png = os.path.join(outdir, 'histrmsdff-{}_thresholded_{}.png'.format(suffix, rmsd_suffix))                                          
-        plt_ff_publication_for_run(outfile.format(rmsd_suffix), x=x, outfile=outfile_png)
-    
+    outfile_png = os.path.join(
+        outdir, 'df_ff-{}_thresholded_{}.png'.format(suffix, rmsd_suffix))
+    if rmsd_filter != '':
+        x = rmsd_filter.split(',')[0]
+        outfile_png = os.path.join(
+            outdir, 'histrmsdff-{}_thresholded_{}.png'.format(suffix, rmsd_suffix))
+        plt_ff_publication_for_run(outfile.format(
+            rmsd_suffix), x=x, outfile=outfile_png)
+
     sequences_thresholded = list(df_dg_ff_thr['seq'])
     print('{} sequences meet the thresholds.'.format(len(sequences_thresholded)))
     if len(sequences_thresholded) > 0:
@@ -227,55 +235,62 @@ def output_filtered_designs(csv_dg, csv_rmsd,
             get_pdb_numbering_from_residue_indices(target_pdb, indices_hal)
         dict_residues.update({'labellist': labellist})
         outfile_logo = \
-            os.path.join(outdir, 'logo_ff-{}_dg_thresholded_rmsd{}.png'.format(suffix, rmsd_suffix))
+            os.path.join(
+                outdir, 'logo_ff-{}_dg_thresholded_rmsd{}.png'.format(suffix, rmsd_suffix))
         sequences_to_logo_without_weblogo(sequences_thresholded, dict_residues=dict_residues,
-                                        outfile_logo=outfile_logo)
+                                          outfile_logo=outfile_logo)
         # write inputs for running alphafold
-        outdir_af2 = os.path.join(outdir, 'ff-{}_ddg_thresholded_rmsd{}'.format(suffix, rmsd_suffix))
+        outdir_af2 = os.path.join(
+            outdir, 'ff-{}_ddg_thresholded_rmsd{}'.format(suffix, rmsd_suffix))
         os.makedirs(outdir_af2, exist_ok=True)
         write_fastas_for_alphafold2(list(df_dg_ff_thr['filename']), outdir_af2)
-        
+
         # interface metrics
         select_by = ['dG_separated']
         design_pdbs = list(set(list(df_dg_ff_thr['filename'])))
         df_iam_mutants = iam_score_df_from_pdbs(design_pdbs)
-        print('iam: ',df_iam_mutants)
-        
+        print('iam: ', df_iam_mutants)
+
         df_iam_ref = iam_score_df_from_pdbs([target_pdb])
         n_all = min(50, len(design_pdbs))
         pdb_dir = os.path.join(outdir, 'interface_metrics_pdbs')
         os.makedirs(pdb_dir, exist_ok=True)
         best_decoys = select_best_designs_by_sum(df_iam_mutants, by=select_by,
-                                                n=n_all, pdb_dir=pdb_dir,
-                                                out_path=pdb_dir)
-        
-        selected_decoys_dir = os.path.join(outdir, 'selected_decoys_iam') 
+                                                 n=n_all, pdb_dir=pdb_dir,
+                                                 out_path=pdb_dir)
+
+        selected_decoys_dir = os.path.join(outdir, 'selected_decoys_iam')
         os.makedirs(selected_decoys_dir, exist_ok=True)
         outfile = os.path.join(selected_decoys_dir, "scatterplot_dgneg.png")
         df_iam_mutants_neg = df_iam_mutants[df_iam_mutants['dG_separated'] < 0.0]
         if 'dG_separated' in df_iam_ref.columns:
-            scatter_hist(df_iam_mutants_neg, ref=df_iam_ref, out=outfile, highlight=best_decoys, by=select_by)
-            out_csv_iam = os.path.join(outdir, 'df_ref_iam.csv'.format(suffix, rmsd_suffix))
+            scatter_hist(df_iam_mutants_neg, ref=df_iam_ref,
+                         out=outfile, highlight=best_decoys, by=select_by)
+            out_csv_iam = os.path.join(
+                outdir, 'df_ref_iam.csv'.format(suffix, rmsd_suffix))
             df_iam_ref.to_csv(out_csv_iam)
         else:
-            scatter_hist(df_iam_mutants_neg, out=outfile, highlight=best_decoys, by=select_by)
-        
+            scatter_hist(df_iam_mutants_neg, out=outfile,
+                         highlight=best_decoys, by=select_by)
+
         df_combined = pd.merge(df_dg_ff_thr, df_iam_mutants, on=['filename'])
-        out_csv_iam = os.path.join(outdir, 'df_ff-{}_dg_iam_thresholded_rmsd{}.csv'.format(suffix, rmsd_suffix))
+        out_csv_iam = os.path.join(
+            outdir, 'df_ff-{}_dg_iam_thresholded_rmsd{}.csv'.format(suffix, rmsd_suffix))
         df_combined.to_csv(out_csv_iam)
 
         df_best_indices = df_iam_mutants.loc[best_decoys]
-        df_combined_best = pd.merge(df_dg_ff_thr, df_best_indices, on=['filename'])
+        df_combined_best = pd.merge(
+            df_dg_ff_thr, df_best_indices, on=['filename'])
         out_csv_iam = \
-            os.path.join(selected_decoys_dir, 
-            'df_ff-{}_dg_thresholded_rmsd{}_bestdecoys.csv'.format(suffix, rmsd_suffix))
+            os.path.join(selected_decoys_dir,
+                         'df_ff-{}_dg_thresholded_rmsd{}_bestdecoys.csv'.format(suffix, rmsd_suffix))
         df_combined_best.to_csv(out_csv_iam)
 
         sequences_iam = list(df_combined_best['seq'])
-        outfile_logo = os.path.join(outdir, 
-        'logo_ff-{}_dg_thresholded_rmsd{}_iam-top{}.png'.format(suffix, rmsd_suffix, n_all))
+        outfile_logo = os.path.join(outdir,
+                                    'logo_ff-{}_dg_thresholded_rmsd{}_iam-top{}.png'.format(suffix, rmsd_suffix, n_all))
         sequences_to_logo_without_weblogo(sequences_iam, dict_residues=dict_residues,
-                                        outfile_logo=outfile_logo)
+                                          outfile_logo=outfile_logo)
 
 
 def mutated_complexes_from_sequences(pdb,
@@ -301,28 +316,32 @@ def mutated_complexes_from_sequences(pdb,
     filtered_design_ids = None
     if csv_rmsd != '':
         df_ff = pd.read_csv(csv_rmsd)
-        outfile = os.path.join(basename, 'filtered_designs_for_dG_calculation.csv')
+        outfile = os.path.join(
+            basename, 'filtered_designs_for_dG_calculation.csv')
         df_ff_thr, _ = threshold_by_rmsd_filters(df_ff, rmsd_filter=rmsd_filter,
-                                                rmsd_filter_json=rmsd_filter_json,
-                                                outfile=outfile)
+                                                 rmsd_filter_json=rmsd_filter_json,
+                                                 outfile=outfile)
         filtered_design_ids = list(set(list(df_ff_thr['design_id'])))
-        print('Number of designs that meet rmsd filter: ', len(filtered_design_ids))
+        print('Number of designs that meet rmsd filter: ',
+              len(filtered_design_ids))
         if len(filtered_design_ids) < 1:
             print('No design has rmsd below specified rmsd filter. Exiting.')
             sys.exit()
         if len(filtered_design_ids) < 10:
-            warnings.warn('!!! Less than 10 designs have rmsd below specified rmsd filter. !!!')
-    
+            warnings.warn(
+                '!!! Less than 10 designs have rmsd below specified rmsd filter. !!!')
+
     base_pose = pose_from_pdb(pdb)
     lines = open(sequences_file, 'r').readlines()
     sequences = [t.rstrip() for t in lines if t.find('>') == -1]
     try:
-        ids = [int(t.split('_')[1]) for t in lines if (t.find('>') !=-1)]
+        ids = [int(t.split('_')[1]) for t in lines if (t.find('>') != -1)]
         assert len(ids) == len(sequences)
 
         ids_sequences_tuples = [(id, seq) for id, seq in zip(ids, sequences)]
         if not filtered_design_ids is None:
-            ids_sequences_tuples = [(id, seq) for id, seq in ids_sequences_tuples if id in filtered_design_ids]
+            ids_sequences_tuples = [
+                (id, seq) for id, seq in ids_sequences_tuples if id in filtered_design_ids]
         dsequences = {}
         for (id, seq) in ids_sequences_tuples:
             dsequences[id] = seq
@@ -330,8 +349,8 @@ def mutated_complexes_from_sequences(pdb,
         dsequences = {}
 
     print('Number of designs: ', len(sequences))
-    
-    #Important - 1 indexed so add one
+
+    # Important - 1 indexed so add one
     ros_positions = [t + 1 for t in res_positions]
 
     pdb_basename = pdb.split('/')[-1]
@@ -357,14 +376,18 @@ def mutated_complexes_from_sequences(pdb,
             docking_res = [min_ros_pos, max_ros_pos]
         basename_packed = os.path.join(basename, 'relaxed_ff_bb_mutants')
         basename_wt_data = os.path.join(basename, 'relaxed_bb_wt_data')
-        new_best_decoy = os.path.join(basename, pdb_basename.rstrip('.pdb') + '_{}.relaxed_bb.pdb')
-        new_best_decoy_wt = os.path.join(basename, pdb_basename.rstrip('.pdb') + '.wt.relaxed_bb.pdb')
+        new_best_decoy = os.path.join(
+            basename, pdb_basename.rstrip('.pdb') + '_{}.relaxed_bb.pdb')
+        new_best_decoy_wt = os.path.join(
+            basename, pdb_basename.rstrip('.pdb') + '.wt.relaxed_bb.pdb')
     else:
         basename_packed = os.path.join(basename, 'relaxed_mutants')
         basename_wt_data = os.path.join(basename, 'relaxed_wt_data')
-        new_best_decoy = os.path.join(basename, pdb_basename.rstrip('.pdb') + '_{}.relaxed.pdb')
-        new_best_decoy_wt = os.path.join(basename, pdb_basename.rstrip('.pdb') + '.wt.relaxed.pdb')
-        docking_res=[]
+        new_best_decoy = os.path.join(
+            basename, pdb_basename.rstrip('.pdb') + '_{}.relaxed.pdb')
+        new_best_decoy_wt = os.path.join(
+            basename, pdb_basename.rstrip('.pdb') + '.wt.relaxed.pdb')
+        docking_res = []
 
     if not os.path.exists(basename_packed):
         os.makedirs(basename_packed, exist_ok=True)
@@ -378,7 +401,7 @@ def mutated_complexes_from_sequences(pdb,
     if (not skip_relax) and prev == 0:
         print('Relaxing wt ...')
         os.makedirs(basename_wt_data, exist_ok=True)
-        
+
         input_packed_poses = []
         if not (use_cluster):
             for index_decoy in range(decoys):
@@ -422,7 +445,7 @@ def mutated_complexes_from_sequences(pdb,
         outfile_int_all = os.path.join(basename_wt_data, 'all_decoys_wt.json')
         open(outfile_int_all, 'w').write(json.dumps(dict_scores))
         outfile_best_decoy = outfile_relax.format('input_%03d' %
-                                 (sorted_dg_input_poses[0][0]))
+                                                  (sorted_dg_input_poses[0][0]))
         os.system('cp {} {}'.format(outfile_best_decoy, new_best_decoy_wt))
 
         min_dG[-1] = {
@@ -446,14 +469,15 @@ def mutated_complexes_from_sequences(pdb,
         basename_data = os.path.join(basename, 'relaxed_mutants_data')
     else:
         basename_data = os.path.join(basename, 'relaxed_ff_bb_mutants_data')
-    
+
     os.makedirs(basename_data, exist_ok=True)
-    
+
     if dsequences != {}:
         traj_ids = [t for t in dsequences if (t < max_seq) and (t >= prev)]
         traj_ids.sort()
     else:
-        traj_ids = [t for t in range(sequences) if (t < max_seq) and (t >= prev)]
+        traj_ids = [t for t in range(sequences) if (
+            t < max_seq) and (t >= prev)]
         traj_ids.sort()
     for iseq in tqdm(traj_ids):
         seq = dsequences[iseq]
@@ -472,10 +496,10 @@ def mutated_complexes_from_sequences(pdb,
             continue
 
         outfile_int_dg = os.path.join(basename_data,
-                                       'min_dG_decoys_{}.json'.format(iseq))
+                                      'min_dG_decoys_{}.json'.format(iseq))
         if os.path.exists(outfile_int_dg):
-           #skip if already processed
-           continue
+            # skip if already processed
+            continue
         relaxed_poses = relax_pose(outfile_mutate.format('%03d' % iseq),
                                    outfile_relax,
                                    iseq,
@@ -490,7 +514,7 @@ def mutated_complexes_from_sequences(pdb,
         packed_poses_sorted_dg = sorted(relaxed_poses, key=lambda tup: tup[2])
         print(iseq, ' Min decoy dg: ', packed_poses_sorted_dg[0][2])
 
-        #Save data
+        # Save data
         dict_scores[iseq] = {
             'decoyid': [t[0] for t in packed_poses_sorted_dg],
             'total_score': [t[1] for t in packed_poses_sorted_dg],
@@ -514,26 +538,30 @@ def mutated_complexes_from_sequences(pdb,
             seq
         }
         outfile_best_decoy = outfile_relax.format('%03d_%03d' %
-                                 (iseq, packed_poses_sorted_dg[0][0]))
-        os.system('cp {} {}'.format(outfile_best_decoy, new_best_decoy.format(iseq)))
+                                                  (iseq, packed_poses_sorted_dg[0][0]))
+        os.system('cp {} {}'.format(
+            outfile_best_decoy, new_best_decoy.format(iseq)))
 
         open(outfile_int_dg, 'w').write(json.dumps(min_dG))
 
     compile_and_plot_results(basename_data, prev, max_seq, outfile_int_dg_wt)
-    
+
     # Interface metrics
     if not pre_mutated:
-        basename_interface_metrics = os.path.join(basename, 'interface_metrics')
+        basename_interface_metrics = os.path.join(
+            basename, 'interface_metrics')
     else:
-        basename_interface_metrics = os.path.join(basename, 'interface_metrics_ff_bb')
+        basename_interface_metrics = os.path.join(
+            basename, 'interface_metrics_ff_bb')
     os.makedirs(basename_interface_metrics, exist_ok=True)
-    design_pdbs = list(sorted(glob.glob(new_best_decoy.replace('{}','*'))))
+    design_pdbs = list(sorted(glob.glob(new_best_decoy.replace('{}', '*'))))
     mutants_interface_metrics_file = os.path.join(basename_interface_metrics,
-                                       'interface_metrics_all.csv')
-    df_mutants = iam_score_df_from_pdbs(design_pdbs, mutants_interface_metrics_file)
+                                                  'interface_metrics_all.csv')
+    df_mutants = iam_score_df_from_pdbs(
+        design_pdbs, mutants_interface_metrics_file)
 
     ref_interface_metrics_file = os.path.join(basename_interface_metrics,
-                                       'interface_metrics_wt.csv')
+                                              'interface_metrics_wt.csv')
     ref_pdbs = list(sorted(glob.glob(new_best_decoy_wt)))
     df_ref = iam_score_df_from_pdbs(ref_pdbs, ref_interface_metrics_file)
 
@@ -568,8 +596,7 @@ def get_args():
     parser.add_argument(
         'designed_seq_file',
         type=str,
-        help=
-        'Sequence file from process_designs.py (sequences_indices.fasta for complex generation);\
+        help='Sequence file from process_designs.py (sequences_indices.fasta for complex generation);\
                         ')
     parser.add_argument('--get_relaxed_complex',
                         action='store_true',
@@ -632,7 +659,7 @@ def get_args():
                         default='',
                         help='Specify complex chains: Eg. HL_X; \
                               where HL chains form one interacting partner\
-                              and X the other'                                              )
+                              and X the other')
     parser.add_argument('--dry_run',
                         action='store_true',
                         default=False,
@@ -653,7 +680,7 @@ def get_args():
                         default='',
                         help='csv file generated by --plot_consolidated_funnels\
                             .Only use designs that were filtered to fold into target structure\
-                            from forward folding runs.'\
+                            from forward folding runs.'
                         )
     parser.add_argument('--rmsd_filter',
                         default='H3,1.8',
@@ -673,12 +700,12 @@ def get_args():
         help='path to forward folded ab structures from forward folding run.\
              If you want to use forward folded structures for virtual screening.\
             Not recommended.')
-    
+
     return parser.parse_args()
 
 
 def get_hal_indices(args):
-    
+
     dict_indices = {}
     dict_exclude = {}
     if args.indices != '':
@@ -690,12 +717,12 @@ def get_hal_indices(args):
         dict_exclude = comma_separated_chain_indices_to_dict(indices_str)
 
     indices_hal = get_indices_from_different_methods(
-        args.target_pdb, \
-        cdr_list=args.cdr_list, \
-        framework=args.framework, \
-        hl_interface=args.hl_interface, \
-        include_indices=dict_indices, \
-        exclude_indices=dict_exclude )
+        args.target_pdb,
+        cdr_list=args.cdr_list,
+        framework=args.framework,
+        hl_interface=args.hl_interface,
+        include_indices=dict_indices,
+        exclude_indices=dict_exclude)
     print("Indices hallucinated: ", indices_hal)
     return indices_hal
 
@@ -708,14 +735,16 @@ if __name__ == '__main__':
         scratch_dir = os.path.join(args.scratch_space)
         os.system("mkdir -p {}".format(scratch_dir))
         use_cluster_decoy = True
-        config_dict = json.load(open(args.slurm_cluster_config,'r'))
+        config_dict = json.load(open(args.slurm_cluster_config, 'r'))
         cluster = SLURMCluster(**config_dict,
-                                local_directory=scratch_dir,
-                                job_extra=[
-                "-o {}".format(os.path.join(scratch_dir, "slurm-%j.out"))
-            ],
-            extra=pyrosetta.distributed.dask.worker_extra(init_flags=init_string)
-            )
+                               local_directory=scratch_dir,
+                               job_extra=[
+                                   "-o {}".format(os.path.join(scratch_dir,
+                                                  "slurm-%j.out"))
+                               ],
+                               extra=pyrosetta.distributed.dask.worker_extra(
+                                   init_flags=init_string)
+                               )
         print(cluster.job_script())
         cluster.adapt(minimum_jobs=min(args.decoys, 2),
                       maximum_jobs=min(args.decoys, args.slurm_scale))
@@ -733,11 +762,11 @@ if __name__ == '__main__':
             args.outdir, 'virtual_binding/relaxed_mutants_data')
         if os.path.exists(basename_mutant_data):
             compile_and_plot_results(basename_mutant_data,
-                                 args.start,
-                                 args.end,
-                                 wt_dG=wt_min_path,
-                                 indices_hal=indices_hal,
-                                 target_pdb=args.target_pdb)
+                                     args.start,
+                                     args.end,
+                                     wt_dG=wt_min_path,
+                                     indices_hal=indices_hal,
+                                     target_pdb=args.target_pdb)
 
     if args.get_relaxed_complex:
         pre_mutated = False
