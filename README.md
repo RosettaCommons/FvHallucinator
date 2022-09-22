@@ -62,7 +62,7 @@ This mode adds a loss during optimization to keep the designed sequence close to
 ### Motif-restricted hallucination
 This mode adds a loss during optimization to sample specified design positions from a restricted set of amino acids at a desired frequency/proportion. For example, to specify that position 100A (must be chothia numbered) on the cdr h3 loop, samples tyrosine and trytophan in equal proportions use options, 
 ```
---restricted_positions_kl_loss_weight 100 \
+--restricted_positions_kl_loss_weight 100 \ #recommended loss weight
 --restrict_positions_to_freq h:100A-W=0.50-Y=0.50 \
 ```
 ## Other options
@@ -82,7 +82,7 @@ python3 generate_fvs_from_sequences.py $TARGET_PDB \
  --slurm_cluster_config config.json \ #if using a cluster, provide json file with cluster config for dask
  --cdr h3 \
  --model $MODEL_FILE \
- --prev_run ${start_run} \
+ --start ${start_run} \
  --end ${end}
 
 # consolidate designs from all folding runs 
@@ -92,10 +92,10 @@ python3 generate_fvs_from_sequences.py $TARGET_PDB \
  --path_forward_folded $DIR/forward_folding \
  --outdir $DIR \
  --cdr_list h3 \
- --prev_run ${start_run} \
+ --start ${start_run} \
  --end ${end}
 ```
-We recommend running folding on a cluster (cpus). When the cluster option is enabled with ```--slurm_cluster_config config.json ```, dask will generate decoys in paralle. Using options ```--prev_run and --end ```, many such scripts can be run in parallel to fold chunks (e.g. 0-10, 10-20, 100-200 etc.) of designed sequences.
+We recommend running folding on a cluster (cpus). When the cluster option is enabled with ```--slurm_cluster_config config.json ```, dask will generate decoys in paralle. Using options ```--start and --end ```, many such scripts can be run in parallel to fold chunks (e.g. 0-10, 10-20, 100-200 etc.) of designed sequences.
 This step requires pyrosetta.
 
 The folded pdbs will be in  $DIR/forward_folding/ and the consolidated root-mean-square-deviations with respect to the target pdb will be in $DIR/forward_folding/results
@@ -104,18 +104,24 @@ The folded pdbs will be in  $DIR/forward_folding/ and the consolidated root-mean
 To virtually screen hallucinated designs, provide a pdb with the structure of the **antibody (Fv only)** and the antigen and run:
 ```
 python3 generate_complexes_from_sequences.py $TARGET_PDB_COMP \
- $DIR/results_indices/sequences_indices.fasta \
+ $DIR/results/sequences_indices.fasta \
  --get_relaxed_complex \ #this option is for virtual screening
  --partner_chains HL_X \ #provide chain names for antibody and antigen chains separated by an underscore
  --outdir $DIR \
  --cdr_list h3 \
- --prev_run ${start_run} \
+ --start ${start_run} \
  --end ${end} \
  --slurm_cluster_config config.json \
  --scratch_space $DIR/tmp_scratch_dg
 
 # consolidate from parallel runs and screen
-
+python3 generate_complexes_from_sequences.py $TARGET_PDB \
+ $DIR/results/sequences_indices.fasta \
+ --plot_consolidated_dG \
+ --outdir $DIR \
+ --indices h:95,96,97,98,99,100,100A,100B,100C,101 \
+ --start ${start_run} \
+ --end ${end}
 ```
 
 ## Filtering final set of designs for folding and binding
