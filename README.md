@@ -13,3 +13,29 @@ source <path_to_env>/bin/activate
 # Use the requirements.txt file to install dependencies
 python3 -m pip install -f requirements.txt
 ```
+# Designing CDR loops with FvHallucinator
+We recommend running hallucination on gpus. Designs can be generated in parallel.
+## Unrestricted hallucination
+To design CDR loops for a target CDR conformation, run unrestricted hallucination.
+In this mode of hallucination, sequences are only constrained by the target structure/conformation.
+Below is an example bash script.
+```
+#!/bin/bash
+#activate virtual environment
+export PYTHONPATH=<path_to_FvHallucinator>:$PYTHONPATH
+# Generating 50 designs
+TARGET_PDB=<chothia_numbered_pdb>
+PREFIX=hallucination_cdrh3
+start=0
+stop=50
+for ((j = $start; j <= $stop; j++)); do
+python3 -W ignore hallucinate.py \
+  --target $TARGET_PDB \ # **chothia** numbered target structure of the Fv region
+  --iterations 50 \
+  --suffix $j \ #suffix to use for design
+  --prefix $PREFIX \ # name of the output folder
+  --seed $j \ # seeding each design with a different seed
+  --cdr_list h3 \
+  --disallow_aas_at_all_positions C #disallow the method from designing cysteines at all positions
+done
+```
