@@ -3,6 +3,7 @@ The code for [FvHallucinator](https://www.biorxiv.org/content/10.1101/2022.06.06
 
 FvHallucinator designs sequences that fold into a desired Fv structure by leveraging a pretrained sequence-to-structure prediction DL model, DeepAb (Ruffolo et al. 2021 Patterns). We adapted the trDesign (Norn 2021 Nature) approach where the problem of predicting sequence given structure has been reframed as the problem of maximizing the conditional probability of a sequence given structure. In the case of the Fv, we are primarily interested in designing a subset of the residues (CDRs, VH-VL interface), so we split the sequence S into fixed and designable positions, SF and SD. We then seek the design subsequence SD that maximizes the conditional probability of the sequence S given a target structure T and the fixed sequence SF. For more details, please refer to [Mahajan et al.](https://www.biorxiv.org/content/10.1101/2022.06.06.494991v3).
 
+All hallucinated sequences from publication are available on [Zenodo](10.5281/zenodo.7076478).
 
 # Requirements
 FvHallucinator requires python3.6 or higher. For a full list of requirements, see requirements.txt.
