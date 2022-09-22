@@ -707,7 +707,7 @@ def get_args():
                         type=int,
                         default=2,
                         help='number of decoys per design for relax')
-    parser.add_argument('--prev_run',
+    parser.add_argument('--start',
                         type=int,
                         default=0,
                         help='continuation run - start from Nth design')
@@ -845,7 +845,7 @@ if __name__ == '__main__':
                 provide valid path for forward folded pdbs with --path_forward_folded'
                                     )
         plot_folded_structure_metrics(args.path_forward_folded,
-                                      args.prev_run,
+                                      args.start,
                                       args.end,
                                       indices_hal=indices_hal,
                                       target_pdb=args.target_pdb)
@@ -866,7 +866,7 @@ if __name__ == '__main__':
                                 out_dir=args.outdir,
                                 num_decoys=args.decoys,
                                 use_cluster=use_cluster_decoy,
-                                start_from=args.prev_run,
+                                start_from=args.start,
                                 last=args.end,
                                 relax_design=args.relax_designs
                                 )

@@ -588,7 +588,7 @@ def get_args():
                         type=int,
                         default=2,
                         help='number of decoys per design for relax')
-    parser.add_argument('--prev_run',
+    parser.add_argument('--start',
                         type=int,
                         default=0,
                         help='continuation run - start from Nth design')
@@ -733,7 +733,7 @@ if __name__ == '__main__':
             args.outdir, 'virtual_binding/relaxed_mutants_data')
         if os.path.exists(basename_mutant_data):
             compile_and_plot_results(basename_mutant_data,
-                                 args.prev_run,
+                                 args.start,
                                  args.end,
                                  wt_dG=wt_min_path,
                                  indices_hal=indices_hal,
@@ -764,7 +764,7 @@ if __name__ == '__main__':
                                          decoys=args.decoys,
                                          dry_run=args.dry_run,
                                          skip_relax=args.skip_relax,
-                                         prev=args.prev_run,
+                                         prev=args.start,
                                          last=args.end,
                                          csv_rmsd=args.csv_forward_folded,
                                          rmsd_filter=args.rmsd_filter,
