@@ -41,7 +41,7 @@ done
 ```
 This script will generate hallucination trajectories and final sequences in $PREFIX/trajectories/
 
-# Post-processing designing and generating sequence logos
+## Post-processing and generating sequence logos
 ```
 python3 -W ignore process_designs.py \
   --trajectory_path $PREFIX \
@@ -51,5 +51,17 @@ python3 -W ignore process_designs.py \
 ```
 Results will include sequences of all h3 designs in the file $PREFIX/results/sequences_indices.fasta, full Fv sequence of all designs in $PREFIX/results/sequences.fasta and sequence logos.
 
-# Hallucination with wildtype seeding
+## Hallucination with wildtype seeding
 Hallucinated designs can be seeded with residues from the starting antibody (target_pdb) instead of random initialization with ``` --seed_with_WT ```.
+
+## Restricted hallucination
+You can additionally guide hallucination towards relevant sequence spaces with sequence based losses as described below.
+
+### Sequence-restricted hallucination
+This mode adds a loss during optimization to keep the designed sequence close to the starting sequence. To enable this loss set a non-zero weight for sequence loss with ```--seq_loss_weight 25 ```, where the weight determines the relative weight of the sequence loss and geometric loss. We recommend weights between 10-30. A higher weight will lead to designs closer to starting sequence and vice-versa.
+### Motif-restricted hallucination
+This mode adds a loss during optimization to sample specified design positions from a restricted set of amino acids at a desired frequency/proportion. For example, to specify that position 100A (must be chothia numbered) on the cdr h3 loop, samples tyrosine and trytophan in equal proportions use options, 
+```
+--restricted_positions_kl_loss_weight 100 \
+--restrict_positions_to_freq h:100A-W=0.50-Y=0.50 \
+```
