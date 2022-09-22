@@ -95,7 +95,7 @@ python3 generate_fvs_from_sequences.py $TARGET_PDB \
  --prev_run ${start_run} \
  --end ${end}
 ```
-We recommend, using a cluster (cpus). When the cluster option is enabled with ```--slurm_cluster_config config.json ```, dask will generate decoys in paralle. Using options ```--prev_run and --end ```, many such scripts can be run in parallel to fold chunks (e.g. 0-10, 10-20, 100-200 etc.) of designed sequences.
+We recommend running folding on a cluster (cpus). When the cluster option is enabled with ```--slurm_cluster_config config.json ```, dask will generate decoys in paralle. Using options ```--prev_run and --end ```, many such scripts can be run in parallel to fold chunks (e.g. 0-10, 10-20, 100-200 etc.) of designed sequences.
 This step requires pyrosetta.
 
 The folded pdbs will be in  $DIR/forward_folding/ and the consolidated root-mean-square-deviations with respect to the target pdb will be in $DIR/forward_folding/results
@@ -116,6 +116,20 @@ python3 generate_complexes_from_sequences.py $TARGET_PDB_COMP \
 
 # consolidate from parallel runs and screen
 
+```
 
+## Filtering final set of designs for folding and binding
+
+```
+python3 filter.py $TARGET_PDB_COMP \
+ --partner_chains HL_X \
+ --prev_run ${start_run} \
+ --end ${end} \
+ --output_filtered_designs \
+ --csv_forward_folded $DIR/forward_folding/results/consolidated_ff_lowest_N010.csv \
+ --csv_complexes $DIR/virtual_binding/relaxed_mutants_data/results/improved_dG_sequences_0-10.csv \
+ --rmsd_filter H3,2.0 \
+ --outdir $DIR/results_filtered_output \
+ --cdr_list h3
 ```
 
