@@ -23,14 +23,14 @@ Below is an example bash script.
 #!/bin/bash
 #activate virtual environment
 export PYTHONPATH=<path_to_FvHallucinator>:$PYTHONPATH
-# Generating 50 designs
+# Generating 50 designs; recommended number of designs for cdrh3 is > 500.
 TARGET_PDB=<chothia_numbered_pdb>
 PREFIX=hallucination_cdrh3
 start=0
 stop=50
 for ((j = $start; j <= $stop; j++)); do
 python3 -W ignore hallucinate.py \
-  --target $TARGET_PDB \ # **chothia** numbered target structure of the Fv region
+  --target $TARGET_PDB \ # **chothia numbered target structure of the Fv region**
   --iterations 50 \
   --suffix $j \ #suffix to use for design
   --prefix $PREFIX \ # name of the output folder
@@ -39,3 +39,14 @@ python3 -W ignore hallucinate.py \
   --disallow_aas_at_all_positions C #disallow the method from designing cysteines at all positions
 done
 ```
+This script will generate hallucination trajectories and final sequences in $PREFIX/trajectories/
+
+# Post-processing designing and generating sequence logos
+```
+python3 -W ignore process_designs.py \
+  --trajectory_path $PREFIX \
+  --target $TARGET_PDB \
+  --cdr h3 \
+  --outdir $PREFIX/results #where the post-processing results will be stored
+```
+Results will include sequences of all h3 designs in the file $PREFIX/results/sequences_indices.fasta, full Fv sequence of all designs in $PREFIX/results/sequences.fasta and sequence logos.
