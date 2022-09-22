@@ -1,5 +1,5 @@
 # FvHallucinator
-The code, data, and weights for [FvHallucinator](https://www.biorxiv.org/content/10.1101/2022.06.06.494991v3) are made available under the [Rosetta-DL](https://github.com/RosettaCommons/Rosetta-DL) license as part of the Rosetta-DL bundle.
+The code for [FvHallucinator](https://www.biorxiv.org/content/10.1101/2022.06.06.494991v3) are made available under the [Rosetta-DL](https://github.com/RosettaCommons/Rosetta-DL) license as part of the Rosetta-DL bundle.
 
 # Requirements
 FvHallucinator requires python3.6 or higher. For a full list of requirements, see requirements.txt.
