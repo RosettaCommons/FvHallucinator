@@ -63,10 +63,6 @@ def get_indices_from_different_methods(target_pdb, cdr_list='', framework=False,
         hl_indices_list = get_indices_for_interface_residues(
             target_pdb, seq, "H", "L")
         indices_hal += hl_indices_list
-        #print("Indices for H/L interface set to design: ", hl_indices_list)
-
-    # Design entire paratope (within x Angstrom of antigen)
-    # get_indices_for_interface_residues(target_pdb, "HL")
 
     # Design select indices of the sequence
     if include_indices != {}:
