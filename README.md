@@ -1,6 +1,9 @@
 # FvHallucinator
 The code for [FvHallucinator](https://www.biorxiv.org/content/10.1101/2022.06.06.494991v3) are made available under the [Rosetta-DL](https://github.com/RosettaCommons/Rosetta-DL) license as part of the Rosetta-DL bundle.
 
+FvHallucinator designs sequences that fold into a desired Fv structure by leveraging a pretrained sequence-to-structure prediction DL model. We adapted the trDesign (Norn 2021 Nature) approach where the problem of predicting sequence given structure has been reframed as the problem of maximizing the conditional probability of a sequence given structure. In the case of the Fv, we are primarily interested in designing a subset of the residues (CDRs, VH-VL interface), so we split the sequence S into fixed and designable positions, SF and SD. We then seek the design subsequence SD that maximizes the conditional probability of the sequence S given a target structure T and the fixed sequence SF.
+
+
 # Requirements
 FvHallucinator requires python3.6 or higher. For a full list of requirements, see requirements.txt.
 For folding hallucinated sequences with DeepAb, you will additionally need a Pyrosetta license (for installing pyrosetta, use conda).
@@ -41,6 +44,7 @@ done
 ```
 This script will generate hallucination trajectories and final sequences in $PREFIX/trajectories/
 
+## Designing any subsequence on the Fv
 It is also possible to design other subsequences on the Fv regions with the following options:
 ```
 # if not option is specified, all cdrs will be designed
@@ -49,9 +53,8 @@ It is also possible to design other subsequences on the Fv regions with the foll
 --framework # design all framework residues
 --exclude <string of indices to exclude from design with chains and chothia numbering> # e.g. h:31A,52/l:56,57
 # --exclude can be combined with --hl_interface, --framework, --cdr_list
-# when only --exclude string is specified, all cdrs will be designed and the positions
-# in exclude will not be designed
 ```
+If no design region is specified, the full Fv will be designed. This mode was not explored in the published work and we do not recommend it.
 
 ## Post-processing and generating sequence logos
 ```
