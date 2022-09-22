@@ -122,10 +122,6 @@ python3 generate_complexes_from_sequences.py $TARGET_PDB_COMP \
 
 ```
 python3 filter.py $TARGET_PDB_COMP \
- --partner_chains HL_X \
- --prev_run ${start_run} \
- --end ${end} \
- --output_filtered_designs \
  --csv_forward_folded $DIR/forward_folding/results/consolidated_ff_lowest_N010.csv \
  --csv_complexes $DIR/virtual_binding/relaxed_mutants_data/results/improved_dG_sequences_0-10.csv \
  --rmsd_filter H3,2.0 \
