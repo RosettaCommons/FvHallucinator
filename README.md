@@ -41,18 +41,16 @@ done
 ```
 This script will generate hallucination trajectories and final sequences in $PREFIX/trajectories/
 
-It is also possible to select other subsequences on the Fv regions with the following options:
+It is also possible to design other subsequences on the Fv regions with the following options:
 ```
 # if not option is specified, all cdrs will be designed
---indices <string of indices to design with chains and chothia numbering> # e.g. h:12,20,31A/l:56,57
+--indices <string of indices to design with chains and chothia numbering> # e.g. h:20,31A/l:56,57
 --hl_interface # design residues at the Vh-Vl interface (only non-cdr residues)
 --framework # design all framework residues
---exclude <string of indices to exclude from design with chains and chothia numbering> # e.g. h:12,20,31A/l:56,57\
-# --exclude and include can be combined with other options such as --hl_interface, --framework, --cdr_list
-# when only --exclude string is specified, all cdrs will be designed and the positions in exclude will not be designed
-
-
-
+--exclude <string of indices to exclude from design with chains and chothia numbering> # e.g. h:31A,52/l:56,57
+# --exclude can be combined with --hl_interface, --framework, --cdr_list
+# when only --exclude string is specified, all cdrs will be designed and the positions
+# in exclude will not be designed
 ```
 
 ## Post-processing and generating sequence logos
