@@ -11,7 +11,7 @@ For folding hallucinated sequences with DeepAb, you will additionally need a Pyr
 
 # Getting Started
 Start by setting up a python virtual environment (or conda) with python3.6 or higher
-```
+```bash
 python3 -m venv <path_to_env> 
 source <path_to_env>/bin/activate
 # Use the requirements.txt file to install dependencies
@@ -25,13 +25,19 @@ In this mode of hallucination, sequences are only constrained by the target stru
 Below is an example bash script. (For all options, run python3 hallucinate.py -h)
 ```
 #!/bin/bash
-#activate virtual environment
+
+# activate virtual environment
+
+# set pythonpath
 export PYTHONPATH=<path_to_FvHallucinator>:$PYTHONPATH
-# Generating 50 designs; recommended number of designs for cdrh3 is > 500.
+
 TARGET_PDB=<chothia_numbered_pdb>
 PREFIX=hallucination_cdrh3
+
+# Generating 50 designs; recommended number of designs for cdrh3 is > 500.
 start=0
 stop=50
+
 for ((j = $start; j <= $stop; j++)); do
 python3 -W ignore hallucinate.py \
   --target $TARGET_PDB \ # **chothia numbered target structure of the Fv region**
@@ -47,7 +53,7 @@ This script will generate hallucination trajectories and final sequences in $PRE
 
 ## Designing any subsequence on the Fv
 It is also possible to design other subsequences on the Fv regions with the following options:
-```
+```bash
 # if not option is specified, all cdrs will be designed
 --indices <string of indices to design with chains and chothia numbering> # e.g. h:20,31A/l:56,57
 --hl_interface # design residues at the Vh-Vl interface (only non-cdr residues)
@@ -58,7 +64,7 @@ It is also possible to design other subsequences on the Fv regions with the foll
 If no design region is specified, the full Fv will be designed. This mode was not explored in the published work and we do not recommend it.
 
 ## Post-processing and generating sequence logos
-```
+```bash
 python3 -W ignore process_designs.py \
   --trajectory_path $PREFIX \
   --target $TARGET_PDB \
@@ -77,7 +83,7 @@ You can additionally guide hallucination towards relevant sequence spaces with s
 This mode adds a loss during optimization to keep the designed sequence close to the starting sequence. To enable this loss set a non-zero weight for sequence loss with ```--seq_loss_weight 25 ```, where the weight determines the relative weight of the sequence loss and geometric loss. We recommend weights between 10-30. A higher weight will lead to designs closer to starting sequence and vice-versa.
 ### Motif-restricted hallucination
 This mode adds a loss during optimization to sample specified design positions from a restricted set of amino acids at a desired frequency/proportion. For example, to specify that position 100A (must be chothia numbered) on the cdr h3 loop, samples tyrosine and trytophan in equal proportions use options, 
-```
+```bash
 --restricted_positions_kl_loss_weight 100 \ #recommended loss weight
 --restrict_positions_to_freq h:100A-W=0.50-Y=0.50 \
 ```
@@ -86,7 +92,7 @@ For a full list of options, run ```python3 hallucinate.py -h ```.
 
 ## Folding hallucinated sequences with DeepAb
 For folding hallucinated sequences with DeepAb and obtaining RMSDs, run:
-```
+```bash
 start_run=0
 end=10
 python3 generate_fvs_from_sequences.py $TARGET_PDB \
@@ -118,7 +124,7 @@ The folded pdbs will be in  $DIR/forward_folding/ and the consolidated root-mean
 
 ## Virtual Screening with Rosetta
 To virtually screen hallucinated designs, provide a pdb with the structure of the **antibody (Fv only)** and the antigen and run:
-```
+```bash
 python3 generate_complexes_from_sequences.py $TARGET_PDB_COMP \
  $DIR/results/sequences_indices.fasta \
  --get_relaxed_complex \ #this option is for virtual screening
@@ -142,7 +148,7 @@ python3 generate_complexes_from_sequences.py $TARGET_PDB \
 
 ## Filtering final set of designs for folding and binding
 
-```
+```bash
 python3 filter.py $TARGET_PDB_COMP \
  --csv_forward_folded $DIR/forward_folding/results/consolidated_ff_lowest_N010.csv \
  --csv_complexes $DIR/virtual_binding/relaxed_mutants_data/results/improved_dG_sequences_0-10.csv \
