@@ -1,13 +1,13 @@
 # FvHallucinator
-The code for [FvHallucinator](https://www.biorxiv.org/content/10.1101/2022.06.06.494991v3) is made available under the [Rosetta-DL](https://github.com/RosettaCommons/Rosetta-DL) license as part of the Rosetta-DL bundle.
+The code for [FvHallucinator](https://www.biorxiv.org/content/10.1101/2022.06.06.494991v3) is made available under the [Rosetta-DL license](https://github.com/RosettaCommons/Rosetta-DL/blob/main/LICENSE.md) as part of the [Rosetta-DL bundle](https://github.com/RosettaCommons/Rosetta-DL).
 
-FvHallucinator designs sequences that fold into a desired Fv structure by leveraging a pretrained sequence-to-structure prediction DL model, DeepAb (Ruffolo et al. 2021 Patterns). We adapted the trDesign (Norn 2021 Nature) approach where the problem of predicting sequence given structure has been reframed as the problem of maximizing the conditional probability of a sequence given structure. In the case of the Fv, we are primarily interested in designing a subset of the residues (CDRs, VH-VL interface), so we split the sequence S into fixed and designable positions, SF and SD. We then seek the design subsequence SD that maximizes the conditional probability of the sequence S given a target structure T and the fixed sequence SF. For more details, please refer to [Mahajan et al.](https://www.biorxiv.org/content/10.1101/2022.06.06.494991v3).
+FvHallucinator designs sequences that fold into a desired Fv structure by leveraging a pretrained sequence-to-structure prediction DL model, DeepAb (Ruffolo et al. 2021 Patterns). We adapted the [trDesign](https://github.com/gjoni/trDesign) (Norn 2021 Nature) approach where the problem of predicting sequence given structure has been reframed as the problem of maximizing the conditional probability of a sequence given structure. In the case of the Fv, we are primarily interested in designing a subset of the residues (CDRs, VH-VL interface), so we split the sequence S into fixed and designable positions, SF and SD. We then seek the design subsequence SD that maximizes the conditional probability of the sequence S given a target structure T and the fixed sequence SF. For more details, please refer to [Mahajan et al. 2022](https://www.biorxiv.org/content/10.1101/2022.06.06.494991v3).
 
 All hallucinated sequences from publication are available on [Zenodo](10.5281/zenodo.7076478).
 
 # Requirements
 FvHallucinator requires python3.6 or higher. For a full list of requirements, see requirements.txt.
-For folding hallucinated sequences with DeepAb, you will additionally need a Pyrosetta license (for installing pyrosetta, use conda).
+For folding hallucinated sequences with DeepAb, you will additionally need a [PyRosetta](https://www.pyrosetta.org) license (for installing pyrosetta, use conda).
 
 # Getting Started
 Start by setting up a python virtual environment (or conda) with python3.6 or higher
@@ -18,7 +18,7 @@ source <path_to_env>/bin/activate
 python3 -m pip install -f requirements.txt
 ```
 # Designing CDR loops with FvHallucinator
-We recommend running hallucination on gpus. Designs can be generated in parallel.
+We recommend running hallucination on GPUs. Designs can be generated in parallel.
 ## Unrestricted hallucination
 To design CDR loops for a target CDR conformation, run unrestricted hallucination.
 In this mode of hallucination, sequences are only constrained by the target structure/conformation.
@@ -71,7 +71,7 @@ python3 -W ignore process_designs.py \
   --cdr h3 \
   --outdir $PREFIX/results #where the post-processing results will be stored
 ```
-Results will include sequences of all h3 designs in the file $PREFIX/results/sequences_indices.fasta, full Fv sequence of all designs in $PREFIX/results/sequences.fasta and sequence logos.
+Results will include sequences of all CDR H3 designs in the file $PREFIX/results/sequences_indices.fasta, full Fv sequence of all designs in $PREFIX/results/sequences.fasta and sequence logos.
 
 ## Hallucination with wildtype seeding
 Hallucinated designs can be seeded with residues from the starting antibody (target_pdb) instead of random initialization with ``` --seed_with_WT ```.
@@ -82,7 +82,7 @@ You can additionally guide hallucination towards relevant sequence spaces with s
 ### Sequence-restricted hallucination
 This mode adds a loss during optimization to keep the designed sequence close to the starting sequence. To enable this loss set a non-zero weight for sequence loss with ```--seq_loss_weight 25 ```, where the weight determines the relative weight of the sequence loss and geometric loss. We recommend weights between 10-30. A higher weight will lead to designs closer to starting sequence and vice-versa.
 ### Motif-restricted hallucination
-This mode adds a loss during optimization to sample specified design positions from a restricted set of amino acids at a desired frequency/proportion. For example, to specify that position 100A (must be chothia numbered) on the cdr h3 loop, samples tyrosine and trytophan in equal proportions use options, 
+This mode adds a loss during optimization to sample specified design positions from a restricted set of amino acids at a desired frequency/proportion. For example, to specify that position 100A (must be chothia numbered) on the CDR H3 loop, samples tyrosine and trytophan in equal proportions use options, 
 
 ```bash
 --restricted_positions_kl_loss_weight 100 \ #recommended loss weight
