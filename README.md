@@ -23,7 +23,7 @@ We recommend running hallucination on gpus. Designs can be generated in parallel
 To design CDR loops for a target CDR conformation, run unrestricted hallucination.
 In this mode of hallucination, sequences are only constrained by the target structure/conformation.
 Below is an example bash script. (For all options, run python3 hallucinate.py -h)
-```
+```bash
 #!/bin/bash
 
 # activate virtual environment
@@ -38,13 +38,13 @@ PREFIX=hallucination_cdrh3
 start=0
 stop=50
 
-for ((j = $start; j <= $stop; j++)); do
+for ((j = $start; j < $stop; j++)); do
 python3 -W ignore hallucinate.py \
-  --target $TARGET_PDB \ # **chothia numbered target structure of the Fv region**
+  --target $TARGET_PDB \            # chothia-numbered target structure for the Fv region
   --iterations 50 \
-  --suffix $j \ #suffix to use for design
-  --prefix $PREFIX \ # name of the output folder
-  --seed $j \ # seeding each design with a different seed
+  --suffix $j \                     #suffix to use for design
+  --prefix $PREFIX \                # name of the output folder
+  --seed $j \                       # seeding each design with a different seed
   --cdr_list h3 \
   --disallow_aas_at_all_positions C #disallow the method from designing cysteines at all positions
 done
@@ -54,7 +54,6 @@ This script will generate hallucination trajectories and final sequences in $PRE
 ## Designing any subsequence on the Fv
 It is also possible to design other subsequences on the Fv regions with the following options:
 ```bash
-# if not option is specified, all cdrs will be designed
 --indices <string of indices to design with chains and chothia numbering> # e.g. h:20,31A/l:56,57
 --hl_interface # design residues at the Vh-Vl interface (only non-cdr residues)
 --framework # design all framework residues
@@ -64,6 +63,7 @@ It is also possible to design other subsequences on the Fv regions with the foll
 If no design region is specified, the full Fv will be designed. This mode was not explored in the published work and we do not recommend it.
 
 ## Post-processing and generating sequence logos
+
 ```bash
 python3 -W ignore process_designs.py \
   --trajectory_path $PREFIX \
@@ -83,6 +83,7 @@ You can additionally guide hallucination towards relevant sequence spaces with s
 This mode adds a loss during optimization to keep the designed sequence close to the starting sequence. To enable this loss set a non-zero weight for sequence loss with ```--seq_loss_weight 25 ```, where the weight determines the relative weight of the sequence loss and geometric loss. We recommend weights between 10-30. A higher weight will lead to designs closer to starting sequence and vice-versa.
 ### Motif-restricted hallucination
 This mode adds a loss during optimization to sample specified design positions from a restricted set of amino acids at a desired frequency/proportion. For example, to specify that position 100A (must be chothia numbered) on the cdr h3 loop, samples tyrosine and trytophan in equal proportions use options, 
+
 ```bash
 --restricted_positions_kl_loss_weight 100 \ #recommended loss weight
 --restrict_positions_to_freq h:100A-W=0.50-Y=0.50 \
@@ -92,7 +93,9 @@ For a full list of options, run ```python3 hallucinate.py -h ```.
 
 ## Folding hallucinated sequences with DeepAb
 For folding hallucinated sequences with DeepAb and obtaining RMSDs, run:
+
 ```bash
+
 start_run=0
 end=10
 python3 generate_fvs_from_sequences.py $TARGET_PDB \
@@ -117,6 +120,7 @@ python3 generate_fvs_from_sequences.py $TARGET_PDB \
  --start ${start_run} \
  --end ${end}
 ```
+
 We recommend running folding on a cluster (cpus). When the cluster option is enabled with ```--slurm_cluster_config config.json ```, dask will generate decoys in paralle. Using options ```--start and --end ```, many such scripts can be run in parallel to fold chunks (e.g. 0-10, 10-20, 100-200 etc.) of designed sequences.
 This step requires pyrosetta.
 
@@ -124,6 +128,7 @@ The folded pdbs will be in  $DIR/forward_folding/ and the consolidated root-mean
 
 ## Virtual Screening with Rosetta
 To virtually screen hallucinated designs, provide a pdb with the structure of the **antibody (Fv only)** and the antigen and run:
+
 ```bash
 python3 generate_complexes_from_sequences.py $TARGET_PDB_COMP \
  $DIR/results/sequences_indices.fasta \
