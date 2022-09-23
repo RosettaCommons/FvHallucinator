@@ -146,7 +146,7 @@ python3 generate_complexes_from_sequences.py $TARGET_PDB \
  $DIR/results/sequences_indices.fasta \
  --plot_consolidated_dG \
  --outdir $DIR \
- --indices h:95,96,97,98,99,100,100A,100B,100C,101 \
+ --cdr h3 \
  --start ${start_run} \
  --end ${end}
 ```
