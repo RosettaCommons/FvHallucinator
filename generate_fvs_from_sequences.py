@@ -637,24 +637,19 @@ def get_args():
         Distributed relax and deltaG (with Rosetta) calculation for designed sequences.
         Designed sequences -> relaxed antibody/complex (pdbs) -> total score/dg calculation.
         Example usage:
-        python3 src/generate_pdbs_from_sequences.py <target pdb chothia numbered>
-        <hallucination_results_dir>/sequences_indices.fasta
-        --get_relaxed_complex # relax and get complex dg
-        --decoys 2  # number of decoys for relax: 20 is a good number to start with>
-        --dry_run # dont relax just run the full protocol once to check setup>
+        python3 generate_fvs_from_sequences.py <target pdb chothia numbered>
+        <hallucination_results_dir>/sequences.fasta
+        --decoys 2  # number of decoys for relax: 2 is a good number to start with>
         --outdir # output directory
         --indices h:95,96,97,98,99,100,100A,100B,100C,101 
-        --partner_chains HL_X #chain names of antibody and antigen
         # Recommended option
-        # set --slurm_cluster_config option to run with dask on a slurm cluster
+        --slurm_cluster_config option to run with dask on a slurm cluster
         ''')
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument('target_pdb',
                         type=str,
                         help='path to target structure chothia numbered pdb file.\
-                            For complex structures, provide pdb for the antibody-antigen complex.\
-                            For antibody only structures from DeepAb, provide target structure of\
-                            the antibody.')
+                            Provide target structure of the antibody.')
     parser.add_argument(
         'designed_seq_file',
         type=str,
@@ -665,16 +660,6 @@ def get_args():
         type=str,
         default='',
         help='path to forward folded ab structures from forward folding run')
-    parser.add_argument('--get_relaxed_complex',
-                        action='store_true',
-                        default=False,
-                        help='Make mutations to target pdb from sequence file,\
-                             relax interface, calc dG, get best dG designs')
-    parser.add_argument('--pdbs_from_model',
-                        action='store_true',
-                        default=False,
-                        help='Forward fold full Ab from full sequence designs\
-                           file with DeepAb/H3 model.')
     parser.add_argument('--plot_consolidated_funnels',
                         action='store_true',
                         default=False,
@@ -682,26 +667,6 @@ def get_args():
                              same funnel plot from forward folding runs\
                              file with DeepAb/H3 model. Must provide path\
                              for forward folding dir')
-    parser.add_argument(
-        '--plot_consolidated_dG',
-        action='store_true',
-        default=False,
-        help='compile dG calculated for sequences into a plot.\
-            Path for individual data files assumed to be same as \
-            --outdir + /virtual_binding/relaxed_mutants_data'
-    )
-    parser.add_argument('--output_filtered_designs',
-                        action='store_true',
-                        default=False,
-                        help='requires csv dataframes from --plot_consolidated_dG\
-                            and --plot_consolidated_funnels.\
-                            Outputs dataframes filtered by\
-                            both RMSD and dG.\
-                            Also, calculates interface metrics for\
-                            for filtered designs. Specify rmsd_filter with\
-                            either --rmsd_filter (single metric) or\
-                            --rmsd_filter_json (multiple metrics)'
-                        )
     parser.add_argument('--rmsd_filter',
                         default='H3,1.8',
                         help='specify metric and threshold separated by a comma.\
