@@ -20,7 +20,7 @@ python3 -m pip install -f requirements.txt
 # Designing CDR loops with FvHallucinator
 We recommend running hallucination on GPUs. Designs can be generated in parallel.
 ## Unrestricted hallucination
-To design CDR loops for a target CDR conformation, run unrestricted hallucination.
+To design CDR loops for a target CDR conformation, run unrestricted hallucination. The pipeline requires all pdbs to be chothia-numbered. To obtain chothia-numbered pdbs, we recommend [Abnum](http://www.bioinf.org.uk/abs/abnum/) or [ANARCI](https://github.com/oxpig/ANARCI).
 In this mode of hallucination, sequences are only constrained by the target structure/conformation.
 Below is an example bash script. (For all options, run python3 hallucinate.py -h)
 ```bash
@@ -72,6 +72,8 @@ python3 process_designs.py \
   --outdir $PREFIX/results #where the post-processing results will be stored
 ```
 Results will include sequences of all CDR H3 designs in the file $PREFIX/results/sequences_indices.fasta, full Fv sequence of all designs in $PREFIX/results/sequences.fasta and sequence logos.
+
+For post-processing designs at the Vh-Vl interface, we additionally use ANARCI. This must be installed as described [here](https://github.com/oxpig/ANARCI). If ANARCI is not installed, FR scores will not be calculated.
 
 ## Hallucination with wildtype seeding
 Hallucinated designs can be seeded with residues from the starting antibody (target_pdb) instead of random initialization with ``` --seed_with_WT ```.
