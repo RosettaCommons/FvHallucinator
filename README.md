@@ -176,7 +176,7 @@ python3 filter.py $TARGET_PDB_COMP \
  --cdr_list h3
 ```
 
-In the above example, we selected design wth CDR H3 RMSD less than or equal to 2.0 angstrom.
+Here, we selected designs wth CDR H3 RMSD less than or equal to 2.0 angstrom.
 You can select based on multiple thresholds as a json file with the option 
 
 ```bash
