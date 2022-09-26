@@ -121,7 +121,19 @@ python3 generate_fvs_from_sequences.py $TARGET_PDB \
  --end ${end}
 ```
 
-We recommend running folding on a cluster (cpus). When the cluster option is enabled with ```--slurm_cluster_config config.json ```, dask will generate decoys in paralle. Using options ```--start and --end ```, many such scripts can be run in parallel to fold chunks (e.g. 0-10, 10-20, 100-200 etc.) of designed sequences.
+We recommend running folding on a cluster (cpus). When the cluster option is enabled with ```--slurm_cluster_config config.json ```, dask will generate decoys in parallel. Using options ```--start and --end ```, many such scripts can be run in parallel to fold chunks (e.g. 0-10, 10-20, 100-200 etc.) of designed sequences.
+
+Example config file for slurm cluster
+```json
+{
+	"cores": 1,
+	"memory": "9GB",
+	"processes": 1,
+	"queue": "defq",
+	"job_cpu": 2,
+	"walltime": "10:00:00"
+}
+```
 This step requires pyrosetta.
 
 The folded pdbs will be in  $DIR/forward_folding/ and the consolidated root-mean-square-deviations with respect to the target pdb will be in $DIR/forward_folding/results
