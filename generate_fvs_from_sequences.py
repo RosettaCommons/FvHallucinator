@@ -777,20 +777,6 @@ def get_args():
         help='Dictionary for setting up slurm cluster. Recommended.\
                 See example config.json. Please modify for your slurm cluster.\
                 If not using, consider using fewer decoys for DeepAb e.g. 2.')
-    parser.add_argument('--partner_chains',
-                        type=str,
-                        default='',
-                        help='Specify complex chains: Eg. HL_X; \
-                              where HL chains form one interacting partner\
-                              and X the other')
-    parser.add_argument('--dry_run',
-                        action='store_true',
-                        default=False,
-                        help='run everything except relax.apply().')
-    parser.add_argument('--skip_relax',
-                        action='store_true',
-                        default=False,
-                        help='run everything except relax.apply().')
     parser.add_argument('--slurm_scale',
                         type=int,
                         default=10,
@@ -803,18 +789,11 @@ def get_args():
                         type=str,
                         default='',
                         help='path to trained model')
-    parser.add_argument('--scatterplot',
-                        action='store_true',
-                        default=False,
-                        help="Produce a scatter plot and select best designs based on score.")
-    parser.add_argument('--n_select',
-                        type=int,
-                        default=20,
-                        help='Number of designs to select based on interfaceanalyzer data')
     parser.add_argument('--relax_designs',
                         action='store_true',
                         default=False,
-                        help='Additional relax of DeepAb folded designs - slow - skip unless evaluating HL interface')
+                        help='Additional relax of DeepAb folded designs - slow\
+                             - skip unless evaluating HL interface')
 
     return parser.parse_args()
 
