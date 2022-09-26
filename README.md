@@ -39,7 +39,7 @@ start=0
 stop=50
 
 for ((j = $start; j < $stop; j++)); do
-python3 -W ignore hallucinate.py \
+python3 hallucinate.py \
   --target $TARGET_PDB \            # chothia-numbered target structure for the Fv region
   --iterations 50 \
   --suffix $j \                     #suffix to use for design
@@ -65,7 +65,7 @@ If no design region is specified, the full Fv will be designed. This mode was no
 ## Post-processing and generating sequence logos
 
 ```bash
-python3 -W ignore process_designs.py \
+python3 process_designs.py \
   --trajectory_path $PREFIX \
   --target $TARGET_PDB \
   --cdr h3 \
