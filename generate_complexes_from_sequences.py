@@ -576,16 +576,15 @@ def get_args():
         Distributed relax and deltaG (with Rosetta) calculation for designed sequences.
         Designed sequences -> relaxed antibody/complex (pdbs) -> total score/dg calculation.
         Example usage:
-        python3 src/generate_complexes_from_sequences.py <target complexpdb chothia numbered>
+        python3 generate_complexes_from_sequences.py <target complex pdb chothia-numbered>
         <hallucination_results_dir>/sequences_indices.fasta
         --get_relaxed_complex # relax and get complex dg
         --decoys 2  # number of decoys for relax: 20 is a good number to start with>
-        --dry_run # dont relax just run the full protocol once to check setup>
         --outdir # output directory
         --indices h:95,96,97,98,99,100,100A,100B,100C,101 
         --partner_chains HL_X #chain names of antibody and antigen
         # Recommended option
-        # set --slurm_cluster_config option to run with dask on a slurm cluster
+        --slurm_cluster_config config.json for slurm cluster
         ''')
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument('target_pdb',
@@ -652,7 +651,7 @@ def get_args():
         type=str,
         default='',
         help='Dictionary for setting up slurm cluster. Recommended.\
-                See example config.json. Please modify for your slurm cluster.\
+                See example config.json in README.md. Please modify for your slurm cluster.\
                 If not using, consider using fewer decoys for DeepAb e.g. 2.')
     parser.add_argument('--partner_chains',
                         type=str,
@@ -692,14 +691,14 @@ def get_args():
                         help='specify multiple metrics and threshold as a json dictionary.\
                              Metric list: OCD, H1, H2, H3, L1, L2, L3, HFr, LFr'
                         )
-    # Not recommended
+    
     parser.add_argument(
         '--path_forward_folded',
         type=str,
         default='',
         help='path to forward folded ab structures from forward folding run.\
              If you want to use forward folded structures for virtual screening.\
-            Not recommended.')
+             Not recommended.')
 
     return parser.parse_args()
 

@@ -92,7 +92,8 @@ This mode adds a loss during optimization to sample specified design positions f
 For a full list of options, run ```python3 hallucinate.py -h ```.
 
 ## Folding hallucinated sequences with DeepAb
-For folding hallucinated sequences with DeepAb and obtaining RMSDs, run:
+
+This step requires PyRosetta. For folding hallucinated sequences with DeepAb and obtaining RMSDs, run:
 
 ```bash
 
@@ -134,7 +135,6 @@ Example config file for slurm cluster
 	"walltime": "10:00:00"
 }
 ```
-This step requires pyrosetta.
 
 The folded pdbs will be in  $DIR/forward_folding/ and the consolidated root-mean-square-deviations with respect to the target pdb will be in $DIR/forward_folding/results
 
@@ -165,6 +165,8 @@ python3 generate_complexes_from_sequences.py $TARGET_PDB \
 
 ## Filtering final set of designs for folding and binding
 
+To obtain designs that satisfy both folding and binding criteria, run:
+
 ```bash
 python3 filter.py $TARGET_PDB_COMP \
  --csv_forward_folded $DIR/forward_folding/results/consolidated_ff_lowest_N010.csv \
@@ -172,5 +174,12 @@ python3 filter.py $TARGET_PDB_COMP \
  --rmsd_filter H3,2.0 \
  --outdir $DIR/results_filtered_output \
  --cdr_list h3
+```
+
+In the above example, we selected design wth CDR H3 RMSD less than or equal to 2.0 angstrom.
+You can select based on multiple thresholds as a json file with the option 
+
+```bash
+--rmsd_filter_json <json file>  # specify CDR RMSD cutoffs with respect to the starting antibody
 ```
 

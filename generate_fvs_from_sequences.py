@@ -634,11 +634,10 @@ def get_rmsd_metrics_for_pdb(pdb_file,
 
 def get_args():
     desc = ('''
-        Distributed relax and deltaG (with Rosetta) calculation for designed sequences.
-        Designed sequences -> relaxed antibody/complex (pdbs) -> total score/dg calculation.
         Example usage:
-        python3 generate_fvs_from_sequences.py <target pdb chothia numbered>
+        python3 generate_fvs_from_sequences.py <target fv chothia-numbered pdb>
         <hallucination_results_dir>/sequences.fasta
+        --pdbs_from_model
         --decoys 2  # number of decoys for relax: 2 is a good number to start with>
         --outdir # output directory
         --indices h:95,96,97,98,99,100,100A,100B,100C,101 
@@ -655,6 +654,11 @@ def get_args():
         type=str,
         help='Sequence file from process_designs.py (sequences_indices.fasta for complex generation;\
                         sequences.fasta for antibody only generation')
+    parser.add_argument('--pdbs_from_model',
+                        action='store_true',
+                        default=False,
+                        help='Forward fold full Ab from full designs\
+                           file with DeepAb model.')
     parser.add_argument(
         '--path_forward_folded',
         type=str,
@@ -690,14 +694,11 @@ def get_args():
                         help='give optional suffix with --output_filtered_designs\
                             if --csv_forward_folded file was generated with a different model'
                         )
-    parser.add_argument('--iter_every',
-                        type=int,
-                        default=None,
-                        help='pick every nth designed sequence')
     parser.add_argument('--decoys',
                         type=int,
                         default=2,
-                        help='number of decoys per design for relax')
+                        help='number of decoys per design for deepAb. \
+                            Decoy with lowest Rosetta total score is saved as the final structure.')
     parser.add_argument('--start',
                         type=int,
                         default=0,
@@ -730,11 +731,7 @@ def get_args():
                         action='store_true',
                         default=False,
                         help='Not implemented! hallucinate hl interface')
-    parser.add_argument('--abag_interface',
-                        action='store_true',
-                        default=False,
-                        help='Not implemented! hallucinate paratope')
-
+    
     parser.add_argument(
         '--slurm_cluster_config',
         type=str,
