@@ -76,7 +76,7 @@ Results will include sequences of all CDR H3 designs in the file $PREFIX/results
 For post-processing designs at the Vh-Vl interface, we additionally use ANARCI. This must be installed as described [here](https://github.com/oxpig/ANARCI). If ANARCI is not installed, FR scores will not be calculated.
 
 ## Hallucination with wildtype seeding
-Hallucinated designs can be seeded with residues from the starting antibody (target_pdb) instead of random initialization with ``` --seed_with_WT ```.
+Design positions can be initialized with residues from the starting antibody (target_pdb) instead of random initialization with ``` --seed_with_WT ```.
 
 ## Restricted hallucination
 You can additionally guide hallucination towards relevant sequence spaces with sequence based losses as described below.
