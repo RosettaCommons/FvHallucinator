@@ -1,7 +1,7 @@
 # FvHallucinator
 The code for [FvHallucinator](https://www.biorxiv.org/content/10.1101/2022.06.06.494991v3) is made available under the [Rosetta-DL license](https://github.com/RosettaCommons/Rosetta-DL/blob/main/LICENSE.md) as part of the [Rosetta-DL bundle](https://github.com/RosettaCommons/Rosetta-DL).
 
-FvHallucinator designs sequences that fold into a desired Fv structure by leveraging a pretrained sequence-to-structure prediction DL model, DeepAb (Ruffolo et al. 2021 Patterns). We adapted the [trDesign](https://github.com/gjoni/trDesign) (Norn 2021 Nature) approach where the problem of predicting sequence given structure has been reframed as the problem of maximizing the conditional probability of a sequence given structure. In the case of the Fv, we are primarily interested in designing a subset of the residues (CDRs, VH-VL interface), so we split the sequence S into fixed and designable positions, SF and SD. We then seek the design subsequence SD that maximizes the conditional probability of the sequence S given a target structure T and the fixed sequence SF. For more details, please refer to [Mahajan et al. 2022](https://www.biorxiv.org/content/10.1101/2022.06.06.494991v3).
+FvHallucinator designs sequences that fold into a desired Fv structure by leveraging a pretrained sequence-to-structure prediction DL model, [DeepAb](https://www.sciencedirect.com/science/article/pii/S2666389921002804) (Ruffolo et al. 2021 Patterns). We adapted the [trDesign](https://www.pnas.org/doi/10.1073/pnas.2017228118) (Norn et al. 2021 PNAS) approach where the problem of predicting sequence given structure has been reframed as the problem of maximizing the conditional probability of a sequence given structure. In the case of the Fv, we are primarily interested in designing a subset of the residues (CDRs, VH-VL interface), so we split the sequence S into fixed and designable positions, SF and SD. We then seek the design subsequence SD that maximizes the conditional probability of the sequence S given a target structure T and the fixed sequence SF. For more details, please refer to [Mahajan et al. 2022](https://www.biorxiv.org/content/10.1101/2022.06.06.494991v3).
 
 All hallucinated sequences from publication are available on [Zenodo](10.5281/zenodo.7076478).
 
@@ -39,7 +39,7 @@ start=0
 stop=50
 
 for ((j = $start; j < $stop; j++)); do
-python3 -W ignore hallucinate.py \
+python3 hallucinate.py \
   --target $TARGET_PDB \            # chothia-numbered target structure for the Fv region
   --iterations 50 \
   --suffix $j \                     #suffix to use for design
@@ -65,7 +65,7 @@ If no design region is specified, the full Fv will be designed. This mode was no
 ## Post-processing and generating sequence logos
 
 ```bash
-python3 -W ignore process_designs.py \
+python3 process_designs.py \
   --trajectory_path $PREFIX \
   --target $TARGET_PDB \
   --cdr h3 \
@@ -121,7 +121,19 @@ python3 generate_fvs_from_sequences.py $TARGET_PDB \
  --end ${end}
 ```
 
-We recommend running folding on a cluster (cpus). When the cluster option is enabled with ```--slurm_cluster_config config.json ```, dask will generate decoys in paralle. Using options ```--start and --end ```, many such scripts can be run in parallel to fold chunks (e.g. 0-10, 10-20, 100-200 etc.) of designed sequences.
+We recommend running folding on a cluster (cpus). When the cluster option is enabled with ```--slurm_cluster_config config.json ```, dask will generate decoys in parallel. Using options ```--start and --end ```, many such scripts can be run in parallel to fold chunks (e.g. 0-10, 10-20, 100-200 etc.) of designed sequences.
+
+Example config file for slurm cluster
+```json
+{
+	"cores": 1,
+	"memory": "9GB",
+	"processes": 1,
+	"queue": "defq",
+	"job_cpu": 2,
+	"walltime": "10:00:00"
+}
+```
 This step requires pyrosetta.
 
 The folded pdbs will be in  $DIR/forward_folding/ and the consolidated root-mean-square-deviations with respect to the target pdb will be in $DIR/forward_folding/results
