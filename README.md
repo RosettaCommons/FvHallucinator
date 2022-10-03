@@ -20,8 +20,9 @@ python3 -m pip install -r requirements.txt
 # Designing CDR loops with FvHallucinator
 We recommend running hallucination on GPUs. Designs can be generated in parallel.
 ## Unrestricted hallucination
-To design CDR loops for a target CDR conformation, run unrestricted hallucination. The pipeline requires all pdbs to be chothia-numbered. To obtain chothia-numbered pdbs, we recommend [Abnum](http://www.bioinf.org.uk/abs/abnum/) or [ANARCI](https://github.com/oxpig/ANARCI).
-In this mode of hallucination, sequences are only constrained by the target structure/conformation.
+To design CDR loops for a target CDR conformation, run unrestricted hallucination. In this mode of hallucination, sequences are only constrained by the target structure/conformation.
+
+The pipeline requires all pdbs to be chothia-numbered. To obtain chothia-numbered pdbs, we recommend [Abnum](http://www.bioinf.org.uk/abs/abnum/) or [ANARCI](https://github.com/oxpig/ANARCI).
 Below is an example bash script. (For all options, run python3 hallucinate.py -h)
 ```bash
 #!/bin/bash
