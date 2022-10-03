@@ -26,14 +26,17 @@ class HallucinationLossParams():
         self.loss_weight_netcharge = weight_netcharge
         self.loss_aa_freq = weight_aa_freq
 
-
+import os, glob
 latest_models = ['latest']
 model_dict = {'latest': 'AbResNet'}
 geometric_loss_dict = [1, 1, 1, 1, 1, 1]
+repo_home = os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../'))
+model_files=os.path.join(repo_home, 'trained_models/ensemble_abresnet/')
+assert len(glob.glob(model_files+'/*.pt')) > 0
 oas_heavy_seq_dist = torch.tensor(
-    np.loadtxt("data/ab_seq_distributions/all_heavy_dist.csv")).float()
+    np.loadtxt("{}/data/ab_seq_distributions/all_heavy_dist.csv".format(repo_home))).float()
 
 oas_light_seq_dist = torch.tensor(
-    np.loadtxt("data/ab_seq_distributions/all_light_dist.csv")).float()
+    np.loadtxt("{}/data/ab_seq_distributions/all_light_dist.csv".format(repo_home))).float()
 
-germline_data_path = "data/h_germline_enrichment"
+germline_data_path = "{}/data/h_germline_enrichment".format(repo_home)

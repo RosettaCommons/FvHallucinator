@@ -332,7 +332,7 @@ def _cli():
         for aa in disallowed_aas:
             assert aa in _aa_dict
 
-    model_file = get_model_file(args.model)
+    model_file = get_model_file()
     loss_weights_for_run = setup_loss_weights(args)
 
     out_dir = args.prefix

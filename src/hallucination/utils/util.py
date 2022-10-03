@@ -317,11 +317,12 @@ def get_restricted_seq_aa_mask(sequence_len, restricted_pos_to_aas_dict,
     return [mask.to(device)]
 
 
-def get_model_file(model_path):
+def get_model_file():
 
-    model_file = glob.glob(model_path + '/*/*.p*')
+    from src.hallucination.params import model_files
+    model_file = glob.glob(model_files + '/*.pt')
     print(model_file)
     if len(model_file) == 0:
         raise FileNotFoundError(
-            'No model files found in {}'.format(model_path + '/*/*.p*'))
+            'No model files found in {}'.format(model_files + '/*.pt'))
     return model_file

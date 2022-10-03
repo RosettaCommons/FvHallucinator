@@ -36,10 +36,6 @@ def _get_args():
                         type=str,
                         default='',
                         help='path to target structure')
-    parser.add_argument('--model',
-                        type=str,
-                        default='',
-                        help='path to trained model')
     parser.add_argument('--cdr_list',
                         type=str,
                         default='',

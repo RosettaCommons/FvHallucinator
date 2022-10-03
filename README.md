@@ -17,6 +17,15 @@ source <path_to_env>/bin/activate
 # Use the requirements.txt file to install dependencies
 python3 -m pip install -r requirements.txt
 ```
+
+# Download pretrained DeepAb model
+Pretrained DeepAb models need 330MB of free space.
+To download, run the following commands in your terminal.
+```bash
+wget https://data.graylab.jhu.edu/ensemble_abresnet_v1.tar.gz
+tar -xvzf ensemble_abresnet_v1.tar.gz
+```
+Move the unzipped folder to <path_to_repo>/trained_models. The hallucinate.py script expects the model weights to be present in <path_to_repo>/trained_models/ensemble_abresnet/*.pt
 # Designing CDR loops with FvHallucinator
 We recommend running hallucination on GPUs. Designs can be generated in parallel.
 ## Unrestricted hallucination

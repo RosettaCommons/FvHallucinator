@@ -6,7 +6,7 @@
 export PYTHONPATH=$PATH_TO_REPO:$PYTHONPATH
 echo $PATH_TO_REPO
 
-TARGET_PDB=$PATH_TO_REPO/data/1n8z.truncated.pdb
+TARGET_PDB=$PATH_TO_REPO/data/herceptin_dataset/1n8z.truncated.pdb
 PREFIX=$PATH_TO_REPO/examples/herceptin_cdrh3
 echo $TARGET_PDB
 echo $PREFIX
