@@ -102,7 +102,7 @@ python3 $PATH_TO_REPO/process_designs.py \
 
 Results will include sequences of all CDR H3 designs in the file $PREFIX/results/sequences_indices.fasta, full Fv sequence of all designs in $PREFIX/results/sequences.fasta and sequence logos.
 
-To compare hallucinated designs with PyIgClassify, you can additionally specify the path for PyIgClassify database. The latest version of this database can be downloaded from [here](). Alternatively, you can use the database used to generate data for the publication from data/cdr_clusters_pssm_dict.pkl with the option:
+To compare hallucinated designs with PyIgClassify, you can additionally specify the path for PyIgClassify database. The latest version of this database can be downloaded from [here](http://dunbrack2.fccc.edu/PyIgClassify/Download/Download.aspx). Alternatively, you can use the database used to generate data for the publication from data/cdr_clusters_pssm_dict.pkl with the option:
 ```bash
 --cdr_cluster_database data/cdr_clusters_pssm_dict.pkl
 ```
