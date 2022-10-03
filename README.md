@@ -5,6 +5,12 @@ FvHallucinator designs sequences that fold into a desired Fv structure by levera
 
 All hallucinated sequences from publication are available on [Zenodo](10.5281/zenodo.7076478).
 
+# Related repositories
+
+trDesign: https://github.com/gjoni/trDesign
+RFDesign: https://github.com/RosettaCommons/RFDesign
+DeepAb: https://github.com/RosettaCommons/DeepAb
+
 # Requirements
 FvHallucinator requires python3.6 or higher. For a full list of requirements, see requirements.txt.
 For folding hallucinated sequences with DeepAb, you will additionally need a [PyRosetta](https://www.pyrosetta.org) license (for installing pyrosetta, use conda or with setup.py).
@@ -202,5 +208,10 @@ You can select based on multiple thresholds as a json file with the option
 
 ```bash
 --rmsd_filter_json <json file>  # specify CDR RMSD cutoffs with respect to the starting antibody
+```
+
+# Citations
+```
+
 ```
 
