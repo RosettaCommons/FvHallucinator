@@ -7,7 +7,7 @@ All hallucinated sequences from publication are available on [Zenodo](10.5281/ze
 
 # Requirements
 FvHallucinator requires python3.6 or higher. For a full list of requirements, see requirements.txt.
-For folding hallucinated sequences with DeepAb, you will additionally need a [PyRosetta](https://www.pyrosetta.org) license (for installing pyrosetta, use conda).
+For folding hallucinated sequences with DeepAb, you will additionally need a [PyRosetta](https://www.pyrosetta.org) license (for installing pyrosetta, use conda or with setup.py).
 
 # Getting Started
 Start by setting up a python virtual environment (or conda) with python3.6 or higher
@@ -15,39 +15,50 @@ Start by setting up a python virtual environment (or conda) with python3.6 or hi
 python3 -m venv <path_to_env> 
 source <path_to_env>/bin/activate
 # Use the requirements.txt file to install dependencies
-python3 -m pip install -f requirements.txt
+python3 -m pip install -r requirements.txt
 ```
 # Designing CDR loops with FvHallucinator
 We recommend running hallucination on GPUs. Designs can be generated in parallel.
 ## Unrestricted hallucination
-To design CDR loops for a target CDR conformation, run unrestricted hallucination. The pipeline requires all pdbs to be chothia-numbered. To obtain chothia-numbered pdbs, we recommend [Abnum](http://www.bioinf.org.uk/abs/abnum/) or [ANARCI](https://github.com/oxpig/ANARCI).
-In this mode of hallucination, sequences are only constrained by the target structure/conformation.
-Below is an example bash script. (For all options, run python3 hallucinate.py -h)
+To design CDR loops for a target CDR conformation, run unrestricted hallucination. In this mode of hallucination, sequences are only constrained by the target structure/conformation.
+
+The pipeline requires all pdbs to be chothia-numbered. To obtain chothia-numbered pdbs, we recommend [Abnum](http://www.bioinf.org.uk/abs/abnum/) or [ANARCI](https://github.com/oxpig/ANARCI).
+Below is an example bash script (also see examples/run_hallucination.sh). (For all options, run python3 hallucinate.py -h)
 ```bash
 #!/bin/bash
 
 # activate virtual environment
 
 # set pythonpath
-export PYTHONPATH=<path_to_FvHallucinator>:$PYTHONPATH
+export PATH_TO_REPO=<path_to_repo>
+export PYTHONPATH=$PATH_TO_REPO:$PYTHONPATH
 
-TARGET_PDB=<chothia_numbered_pdb>
-PREFIX=hallucination_cdrh3
+# chothia-numbered target structure for the Fv region
+# example pdb for Trastuzumab Fv from data
+TARGET_PDB=$PATH_TO_REPO/data/1n8z.truncated.pdb
+
+# name of the output folder
+PREFIX=$PATH_TO_REPO/examples/hallucination_cdrh3
 
 # Generating 50 designs; recommended number of designs for cdrh3 is > 500.
 start=0
 stop=50
 
+# --seed <> manual seeding each design with a different seed
+# --suffix <> suffix to use for each design
+# disallow the method from designing cysteines at all positions
+
 for ((j = $start; j < $stop; j++)); do
-python3 hallucinate.py \
-  --target $TARGET_PDB \            # chothia-numbered target structure for the Fv region
+python3 $PATH_TO_REPO/hallucinate.py \
+  --target $TARGET_PDB \
   --iterations 50 \
-  --suffix $j \                     #suffix to use for design
-  --prefix $PREFIX \                # name of the output folder
-  --seed $j \                       # seeding each design with a different seed
+  --suffix $j \
+  --prefix $PREFIX \
+  --seed $j \
   --cdr_list h3 \
-  --disallow_aas_at_all_positions C #disallow the method from designing cysteines at all positions
+  --disallow_aas_at_all_positions C
 done
+
 ```
 This script will generate hallucination trajectories and final sequences in $PREFIX/trajectories/
 
