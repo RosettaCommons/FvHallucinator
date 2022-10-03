@@ -5,6 +5,8 @@ FvHallucinator designs sequences that fold into a desired Fv structure by levera
 
 All hallucinated sequences from publication are available on [Zenodo](10.5281/zenodo.7076478).
 
+The FvHallucinator reository builds upon the [DeepAb](https://github.com/RosettaCommons/DeepAb) repository.
+
 # Related repositories
 
 trDesign: https://github.com/gjoni/trDesign <br />
