@@ -212,6 +212,7 @@ You can select based on multiple thresholds as a json file with the option
 
 # Citations
 ```
+Mahajan, S. P., Ruffolo, J. A., Frick, R., & Gray, J. J. A deep learning framework to hallucinate structure-conditioned and antigen-specific antibodies. bioRxiv 2022.06.06.494991 (2022)
 
 ```
 
