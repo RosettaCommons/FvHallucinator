@@ -7,9 +7,9 @@ All hallucinated sequences from publication are available on [Zenodo](10.5281/ze
 
 # Related repositories
 
-trDesign: https://github.com/gjoni/trDesign
-RFDesign: https://github.com/RosettaCommons/RFDesign
-DeepAb: https://github.com/RosettaCommons/DeepAb
+trDesign: https://github.com/gjoni/trDesign \n
+RFDesign: https://github.com/RosettaCommons/RFDesign \n
+DeepAb: https://github.com/RosettaCommons/DeepAb \n
 
 # Requirements
 FvHallucinator requires python3.6 or higher. For a full list of requirements, see requirements.txt.
