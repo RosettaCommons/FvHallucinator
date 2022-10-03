@@ -7,7 +7,7 @@ All hallucinated sequences from publication are available on [Zenodo](10.5281/ze
 
 # Requirements
 FvHallucinator requires python3.6 or higher. For a full list of requirements, see requirements.txt.
-For folding hallucinated sequences with DeepAb, you will additionally need a [PyRosetta](https://www.pyrosetta.org) license (for installing pyrosetta, use conda).
+For folding hallucinated sequences with DeepAb, you will additionally need a [PyRosetta](https://www.pyrosetta.org) license (for installing pyrosetta, use conda or with setup.py).
 
 # Getting Started
 Start by setting up a python virtual environment (or conda) with python3.6 or higher
