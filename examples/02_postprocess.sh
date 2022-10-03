@@ -20,5 +20,5 @@ python3 $PATH_TO_REPO/process_designs.py \
   --target $TARGET_PDB \
   --cdr h3 \
   --outdir $PREFIX/results\
-  --cdr_cluster_database data/cdr_clusters_pssm_dict.pkl
+  --cdr_cluster_database $PATH_TO_REPO/data/cdr_clusters_pssm_dict.pkl
 
