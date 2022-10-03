@@ -1,0 +1,5 @@
+# To download DeepAb pretrained models
+wget https://data.graylab.jhu.edu/ensemble_abresnet_v1.tar.gz
+tar -xvzf ensemble_abresnet_v1.tar.gz
+
+#Copy ensemble_abresnet to the folder trained_models
