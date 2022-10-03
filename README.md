@@ -23,7 +23,7 @@ We recommend running hallucination on GPUs. Designs can be generated in parallel
 To design CDR loops for a target CDR conformation, run unrestricted hallucination. In this mode of hallucination, sequences are only constrained by the target structure/conformation.
 
 The pipeline requires all pdbs to be chothia-numbered. To obtain chothia-numbered pdbs, we recommend [Abnum](http://www.bioinf.org.uk/abs/abnum/) or [ANARCI](https://github.com/oxpig/ANARCI).
-Below is an example bash script. (For all options, run python3 hallucinate.py -h)
+Below is an example bash script (also see examples/run_hallucination.sh). (For all options, run python3 hallucinate.py -h)
 ```bash
 #!/bin/bash
 
