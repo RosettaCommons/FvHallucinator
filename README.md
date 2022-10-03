@@ -15,7 +15,7 @@ Start by setting up a python virtual environment (or conda) with python3.6 or hi
 python3 -m venv <path_to_env> 
 source <path_to_env>/bin/activate
 # Use the requirements.txt file to install dependencies
-python3 -m pip install -f requirements.txt
+python3 -m pip install -r requirements.txt
 ```
 # Designing CDR loops with FvHallucinator
 We recommend running hallucination on GPUs. Designs can be generated in parallel.
