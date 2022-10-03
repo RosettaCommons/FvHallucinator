@@ -95,8 +95,7 @@ For a full list of options, run ```python3 hallucinate.py -h ```.
 
 ## Folding hallucinated sequences with DeepAb
 
-This step requires PyRosetta. For folding hallucinated sequences with DeepAb and obtaining RMSDs, run:
-
+For folding hallucinated sequences with DeepAb and obtaining RMSDs, run:
 ```bash
 
 start_run=0
