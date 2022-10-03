@@ -102,6 +102,7 @@ def setup_loss_weights(args):
         geometric_loss_list = [
             float(t) for t in (args.geometric_loss_list).split(',')
         ]
+        assert len(geometric_loss_list) == 6
 
     weight_netcharge = 1.0 if args.restrict_total_charge else 0.0
     weight_max_aa_freq = 1.0 if args.restrict_max_aa_freq else 0.0
