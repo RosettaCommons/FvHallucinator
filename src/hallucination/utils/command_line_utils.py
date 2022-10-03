@@ -96,9 +96,9 @@ def _get_args():
         help='Constrain max number of AA of same type to max of 4.')
     parser.add_argument('--geometric_loss_list',
                         type=str,
-                        default='1,1,1,1,1',
+                        default='1,1,1,1,1,1',
                         help='Specific loss weights for distance, orientation etc.\
-                            First 3 for distances; remaining for dihedral and planar geometries.\
+                            First 3 for distances; 3 for dihedral and planar geometries.\
                             See DeepAb methods sections for more details.')
     parser.add_argument('--restrict_positions_to_freq',
                         type=str,
