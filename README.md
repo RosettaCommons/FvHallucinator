@@ -175,7 +175,7 @@ Example config file for slurm cluster
 The folded pdbs will be in  $DIR/forward_folding/ and the consolidated root-mean-square-deviations with respect to the target pdb will be in $DIR/forward_folding/results
 
 ## Virtual Screening with Rosetta
-To virtually screen hallucinated designs, provide a pdb with the structure of the **antibody (Fv only)** and the antigen and run:
+To virtually screen hallucinated designs, provide a pdb with the structure of the **antibody (Fv only) and the antigen** and run:
 
 ```bash
 python3 $PATH_TO_REPO/generate_complexes_from_sequences.py $TARGET_PDB_COMP \
