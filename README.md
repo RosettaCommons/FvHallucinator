@@ -97,7 +97,14 @@ python3 process_designs.py \
   --cdr h3 \
   --outdir $PREFIX/results #where the post-processing results will be stored
 ```
+
 Results will include sequences of all CDR H3 designs in the file $PREFIX/results/sequences_indices.fasta, full Fv sequence of all designs in $PREFIX/results/sequences.fasta and sequence logos.
+
+To compare hallucinated designs with PyIgClassify, you can additionally specify the path for PyIgClassify database. The latest version of this database can be downloaded from [here](). Alternatively, you can use the database used to generate data for the publication from data/cdr_clusters_pssm_dict.pkl with the option:
+```bash
+--cdr_cluster_database data/cdr_clusters_pssm_dict.pkl
+```
+This option only works with the option ```--cdr <cdr_name>```.
 
 For post-processing designs at the Vh-Vl interface, we additionally use ANARCI. This must be installed as described [here](https://github.com/oxpig/ANARCI). If ANARCI is not installed, FR scores will not be calculated.
 
