@@ -3,8 +3,9 @@ import sys
 import glob
 import matplotlib.pyplot as plt
 import pandas as pd
-from hallucination.utils.sequence_utils import biopython_developability_dataframes
-from util.pdb import get_pdb_chain_seq
+from src.hallucination.utils.sequence_utils \
+    import biopython_developability_dataframes
+from src.util.pdb import get_pdb_chain_seq
 
 from Bio.PDB import PDBParser
 from Bio.SeqUtils import seq1
