@@ -1,0 +1,8 @@
+{
+	"cores": 1,
+	"memory": "9GB",
+	"processes": 1,
+	"queue": "defq",
+	"job_cpu": 2,
+	"walltime": "10:00:00"
+}
