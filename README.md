@@ -93,7 +93,7 @@ If no design region is specified, the full Fv will be designed. This mode was no
 ## Post-processing and generating sequence logos
 
 ```bash
-python3 $PATH_TO_REPO/process_designs.py \
+python3 $PATH_TO_REPO/process_designs.sh \
   --trajectory_path $PREFIX \
   --target $TARGET_PDB \
   --cdr h3 \
