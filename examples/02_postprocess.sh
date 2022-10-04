@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# activate virtual environment
-module unload python
-module load anaconda
-conda deactivate
-conda activate /scratch16/jgray21/smahaja4_active/repositories/conda_deeph3_hal
-
 # set pythonpath
 export PYTHONPATH=$PATH_TO_REPO:$PYTHONPATH
 echo $PATH_TO_REPO
