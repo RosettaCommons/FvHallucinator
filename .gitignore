@@ -61,6 +61,7 @@ trained_models/
 hallucinations/
 
 # Etc.
+*.json
 *.p
 *.swp
 *.csv
