@@ -11,6 +11,7 @@ from pyrosetta import *
 import os, glob
 import seaborn as sns
 import matplotlib.pyplot as plt
+import pandas as pd
 
 
 def write_fastas_for_alphafold2(pdb_files, outpath, chunk_size=20):
