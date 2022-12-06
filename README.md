@@ -143,8 +143,8 @@ python3 $PATH_TO_REPO/generate_fvs_from_sequences.py $TARGET_PDB \
  --pdbs_from_model \
  --decoys 5 \
  --outdir $DIR \
- --scratch_space $DIR/tmp_scratch
- --slurm_cluster_config config.json
+ --scratch_space $DIR/tmp_scratch \
+ --slurm_cluster_config config.json \
  --cdr_list h3 \
  --start ${start_run} \
  --end ${end}
